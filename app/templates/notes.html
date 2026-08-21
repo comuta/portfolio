@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}/notizen — {{ super() }}{% endblock %}
+
+{% block content %}
+  <div class="listing-head">
+    <h1>/notizen</h1>
+    <span class="eyebrow">chronologisch · <a href="/feed.xml">feed.xml</a></span>
+  </div>
+  <p class="prose detail-head__lead">Kürzere Einträge ohne Projektcharakter: gelöste Probleme, Entscheidungen, Fundstücke.</p>
+
+  <div class="note-list">
+    {% for note in notes %}
+      <article class="note">
+        <div class="note__date">{{ note.datum }}</div>
+        <div>
+          <h2 class="note__title">{{ note.titel }}</h2>
+          <div class="prose">{{ note.content_html | safe }}</div>
+          {% if note.themen %}
+            <ul class="tag-list tag-list--small">
+              {% for t in note.themen %}<li>thema:{{ t }}</li>{% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+      </article>
+    {% else %}
+      <p>Noch keine Notizen.</p>
+    {% endfor %}
+  </div>
+{% endblock %}

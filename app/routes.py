@@ -106,6 +106,11 @@ def project_detail(slug):
     return render_template("project_detail.html", post=post, next_post=next_post)
 
 
+@public.route("/notizen")
+def notes():
+    return render_template("notes.html", notes=content.list_notes(_content_dir()))
+
+
 @public.route("/projekte/<slug>/medien/<path:dateiname>")
 def project_medium(slug, dateiname):
     post = _get_post_or_404(slug)
