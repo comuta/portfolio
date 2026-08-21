@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}/projekte — {{ super() }}{% endblock %}
+
+{% block content %}
+  <div class="listing-head">
+    <h1>/projekte</h1>
+    <span class="eyebrow">{{ total_count }} einträge · sortiert nach datum</span>
+  </div>
+
+  <ul class="chip-list" aria-label="Nach Stack oder Thema filtern">
+    <li>
+      <a class="chip{% if active_label == 'alle' %} chip--active{% endif %}" href="/projekte">alle</a>
+    </li>
+    {% for s in stacks %}
+      <li>
+        <a class="chip{% if active_label == 'stack:' ~ s %} chip--active{% endif %}" href="{{ url_for('public.projects_by_stack', stack_name=s) }}">stack:{{ s }}</a>
+      </li>
+    {% endfor %}
+    {% for t in themen %}
+      <li>
+        <a class="chip{% if active_label == 'thema:' ~ t %} chip--active{% endif %}" href="{{ url_for('public.projects_by_thema', thema=t) }}">thema:{{ t }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <div class="table-scroll">
+    <table class="entry-table">
+      <thead>
+        <tr>
+          <th scope="col">datum</th>
+          <th scope="col">titel / kurzbeschreibung</th>
+          <th scope="col">stack</th>
+          <th scope="col">status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for project in projects %}
+          <tr>
+            <td>{{ project.datum }}</td>
+            <td>
+              <a href="/projekte/{{ project.slug }}/">{{ project.titel }}</a>
+              <p class="entry-table__desc">{{ project.kurzbeschreibung }}</p>
+            </td>
+            <td>{{ project.stack | join(', ') }}</td>
+            <td>{{ project.status or '' }}</td>
+          </tr>
+        {% else %}
+          <tr><td colspan="4">Keine Einträge für diese Auswahl.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if total_pages > 1 %}
+    <nav class="pagination" aria-label="Seiten">
+      <span>seite {{ page }} von {{ total_pages }}</span>
+      <span class="pagination__links">
+        {% if page > 1 %}
+          <a class="button" href="?seite={{ page - 1 }}">← zurück</a>
+        {% else %}
+          <span class="button button--disabled">← zurück</span>
+        {% endif %}
+        {% if page < total_pages %}
+          <a class="button button--primary" href="?seite={{ page + 1 }}">weiter →</a>
+        {% else %}
+          <span class="button button--disabled">weiter →</span>
+        {% endif %}
+      </span>
+    </nav>
+  {% endif %}
+{% endblock %}
