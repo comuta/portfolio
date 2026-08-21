@@ -1,12 +1,12 @@
 ### Angaben gemäß § 5 DDG
 
-Vorname Nachname
-Straße und Hausnummer
+Vorname Nachname  
+Straße und Hausnummer  
 Postleitzahl Ort
 
 ### Kontakt
 
-E-Mail: adresse@example.dev
+E-Mail: adresse@example.dev  
 Zweiter Kommunikationsweg: Angabe
 
 ### Verantwortlich für den Inhalt
