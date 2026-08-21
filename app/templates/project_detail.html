@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.titel }} — {{ super() }}{% endblock %}
+{% block description %}{{ post.kurzbeschreibung }}{% endblock %}
+
+{% block content %}
+  <div class="detail-head">
+    <div class="eyebrow"><a href="/projekte">/projekte</a> / <span>{{ post.slug }}</span></div>
+    <h1 class="detail-head__title">{{ post.titel }}</h1>
+    {% if post.kurzbeschreibung %}
+      <p class="prose detail-head__lead">{{ post.kurzbeschreibung }}</p>
+    {% endif %}
+  </div>
+
+  {% if post.titelbild_dateiname %}
+    <figure class="titelbild">
+      <img
+        src="{{ url_for('public.project_medium', slug=post.slug, dateiname=post.titelbild_dateiname) }}"
+        alt="Titelbild zu {{ post.titel }}"
+        width="1600" height="900" loading="eager">
+      <figcaption>
+        <span>titelbild</span>
+        <span>1600 × 900</span>
+      </figcaption>
+    </figure>
+  {% endif %}
+
+  <div class="two-col">
+    <article class="prose">
+      {{ post.content_html | safe }}
+
+      <div class="detail-footer">
+        <a href="/projekte">← /projekte</a>
+        {% if next_post %}
+          <a href="/projekte/{{ next_post.slug }}/">nächster beitrag: {{ next_post.titel }} →</a>
+        {% endif %}
+      </div>
+    </article>
+
+    <aside class="meta-box" aria-label="Beitragsdaten">
+      <div class="meta-box__section meta-box__section--header">meta.json</div>
+      <dl class="meta-box__list">
+        <div><dt>datum</dt><dd>{{ post.datum }}</dd></div>
+        <div><dt>typ</dt><dd>{{ post.typ }}</dd></div>
+        {% if post.status %}<div><dt>status</dt><dd>{{ post.status }}</dd></div>{% endif %}
+        {% if post.zeitraum %}<div><dt>zeitraum</dt><dd>{{ post.zeitraum }}</dd></div>{% endif %}
+        {% if post.rolle %}<div><dt>rolle</dt><dd>{{ post.rolle }}</dd></div>{% endif %}
+        {% if post.kunde %}
+          <div>
+            <dt>kunde</dt>
+            <dd>
+              {% if post.kunde.nennung_erlaubt and post.kunde.name %}
+                {{ post.kunde.name }}
+              {% else %}
+                {{ post.kunde.bezeichnung_anonym or "anonymisiert" }}
+              {% endif %}
+            </dd>
+          </div>
+        {% endif %}
+      </dl>
+
+      {% if post.stack %}
+        <div class="meta-box__section">
+          <div class="eyebrow">stack</div>
+          <ul class="tag-list">{% for s in post.stack %}<li>{{ s }}</li>{% endfor %}</ul>
+        </div>
+      {% endif %}
+
+      {% if post.themen %}
+        <div class="meta-box__section">
+          <div class="eyebrow">themen</div>
+          <ul class="tag-list">{% for t in post.themen %}<li>{{ t }}</li>{% endfor %}</ul>
+        </div>
+      {% endif %}
+
+      {% if post.demo or post.repository %}
+        <div class="meta-box__section">
+          {% if post.demo %}
+            <div class="eyebrow">demo</div>
+            <p class="meta-box__note">
+              {% if post.demo.verfuegbar %}{{ post.demo.hinweis or "vorhanden" }}{% else %}nicht vorhanden{% endif %}
+            </p>
+          {% endif %}
+          <div class="eyebrow">repository</div>
+          {% if post.repository %}
+            <p><a href="{{ post.repository }}">{{ post.repository }}</a></p>
+          {% else %}
+            <p class="meta-box__note">null — kein link</p>
+          {% endif %}
+        </div>
+      {% endif %}
+    </aside>
+  </div>
+{% endblock %}

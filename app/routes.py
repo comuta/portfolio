@@ -1,6 +1,7 @@
 import math
+from pathlib import Path
 
-from flask import Blueprint, current_app, render_template, request
+from flask import Blueprint, abort, current_app, render_template, request, send_from_directory
 
 from . import content
 
@@ -80,3 +81,38 @@ def projects_by_stack(stack_name):
     all_projects = content.list_projects(_content_dir())
     filtered = [p for p in all_projects if stack_name in p.stack]
     return _render_project_listing(all_projects, filtered, f"stack:{stack_name}")
+
+
+def _get_post_or_404(slug: str) -> content.Post:
+    post = content.get_post(_content_dir(), slug)
+    if post is None:
+        abort(404)
+    return post
+
+
+@public.route("/projekte/<slug>/")
+def project_detail(slug):
+    post = _get_post_or_404(slug)
+    if post.typ != "projekt":
+        abort(404)
+
+    projects = content.list_projects(_content_dir())
+    next_post = None
+    for i, p in enumerate(projects):
+        if p.slug == slug and i + 1 < len(projects):
+            next_post = projects[i + 1]
+            break
+
+    return render_template("project_detail.html", post=post, next_post=next_post)
+
+
+@public.route("/projekte/<slug>/medien/<path:dateiname>")
+def project_medium(slug, dateiname):
+    post = _get_post_or_404(slug)
+
+    medien_dir = (Path(_content_dir()) / "beitraege" / "oeffentlich" / post.dir_name / "medien").resolve()
+    ziel = (medien_dir / dateiname).resolve()
+    if not ziel.is_relative_to(medien_dir) or not ziel.is_file():
+        abort(404)
+
+    return send_from_directory(medien_dir, dateiname)
