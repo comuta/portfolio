@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ site_config.name if site_config else "Portfolio" }}{% endblock %}</title>
+  <meta name="description" content="{% block description %}{{ site_config.kurzprofil if site_config else "" }}{% endblock %}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <a class="skip-link" href="#main">Zum Inhalt springen</a>
+  <div class="wrap">
+    <header class="site-header">
+      <a class="site-header__name" href="/">{{ site_config.name if site_config else "VORNAME NACHNAME" }}</a>
+      <nav aria-label="Hauptnavigation">
+        <ul class="site-nav">
+          {% set nav_items = [
+            ("/", "start"),
+            ("/projekte", "projekte"),
+            ("/notizen", "notizen"),
+            ("/ueber-mich", "über-mich"),
+          ] %}
+          {% for href, label in nav_items %}
+            {% set is_active = (href == "/" and request.path == "/") or (href != "/" and request.path.startswith(href)) %}
+            <li><a href="{{ href }}"{% if is_active %} aria-current="page"{% endif %}>{{ label }}</a></li>
+          {% endfor %}
+        </ul>
+      </nav>
+    </header>
+
+    <main id="main" class="site-main">
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+      <ul class="site-footer__links">
+        <li><a href="/impressum">impressum</a></li>
+        <li><a href="/datenschutz">datenschutz</a></li>
+      </ul>
+      <span>keine cookies · keine drittanbieter</span>
+    </footer>
+  </div>
+</body>
+</html>

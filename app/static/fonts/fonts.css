@@ -1,0 +1,19 @@
+/* Self-hosted variable fonts (FA-32: no third-party font CDN).
+   Vendored from fonts.gstatic.com; both files are variable fonts, so one
+   file per family covers the whole weight range used by the site. */
+
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url('newsreader-variable.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Roboto Mono';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('roboto-mono-variable.woff2') format('woff2');
+}
