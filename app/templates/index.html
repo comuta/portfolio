@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="two-col">
+    <div>
+      {% if site_config %}
+        <p class="prose">{{ site_config.kurzprofil }}</p>
+      {% endif %}
+
+      <section aria-labelledby="letzte-eintraege-heading">
+        <h2 id="letzte-eintraege-heading" class="eyebrow">// letzte einträge</h2>
+        <div class="table-scroll"><table class="entry-table">
+          <thead>
+            <tr>
+              <th scope="col">datum</th>
+              <th scope="col">titel</th>
+              <th scope="col">typ</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for eintrag in latest %}
+              <tr>
+                <td>{{ eintrag.datum }}</td>
+                <td>
+                  {% if eintrag.typ == "projekt" %}
+                    <a href="/projekte/{{ eintrag.slug }}/">{{ eintrag.titel }}</a>
+                  {% else %}
+                    <a href="/notizen">{{ eintrag.titel }}</a>
+                  {% endif %}
+                </td>
+                <td class="entry-table__typ entry-table__typ--{{ eintrag.typ }}">{{ eintrag.typ }}</td>
+              </tr>
+            {% else %}
+              <tr><td colspan="3">Noch keine Einträge.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table></div>
+      </section>
+
+      {% if site_config and site_config.hinweis %}
+        <blockquote class="prose callout">{{ site_config.hinweis }}</blockquote>
+      {% endif %}
+    </div>
+
+    <aside class="sidebar" aria-label="Zusatzinformationen">
+      {% if site_config and site_config.verfuegbarkeit.anzeigen and site_config.verfuegbarkeit.text %}
+        <div class="status-box">
+          <div class="eyebrow">status</div>
+          <p>{{ site_config.verfuegbarkeit.text }}</p>
+        </div>
+      {% endif %}
+
+      {% if stack %}
+        <div>
+          <div class="eyebrow">stack</div>
+          <ul class="plain-list">
+            {% for item in stack %}<li>{{ item }}</li>{% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      {% if site_config and site_config.aliase %}
+        <div>
+          <div class="eyebrow">aliase</div>
+          <ul class="plain-list">
+            {% for alias in site_config.aliase %}
+              <li>
+                {% if alias.url %}
+                  <a class="alias-link" href="{{ alias.url }}">{{ alias.plattform | lower }}/{{ alias.anzeige }}</a>
+                {% else %}
+                  {{ alias.plattform | lower }}/{{ alias.anzeige }}
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+    </aside>
+  </div>
+{% endblock %}

@@ -118,6 +118,7 @@ class SiteConfig(BaseModel):
     name: str
     aliase: list[Alias] = Field(default_factory=list)
     kurzprofil: str = ""
+    hinweis: str | None = None
     verfuegbarkeit: Verfuegbarkeit = Field(default_factory=Verfuegbarkeit)
     kontakt: Kontakt
     impressum: ImpressumAngaben
