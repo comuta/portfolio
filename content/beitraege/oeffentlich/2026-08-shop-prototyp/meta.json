@@ -1,0 +1,29 @@
+{
+  "titel": "Prototyp eines Onlineshops",
+  "datum": "2026-08-17",
+  "typ": "projekt",
+  "status": "abgeschlossen",
+  "kurzbeschreibung": "Machbarkeitsnachweis für einen Kunden aus dem Einzelhandel.",
+  "stack": [
+    "Flask",
+    "PostgreSQL",
+    "nginx"
+  ],
+  "themen": [
+    "Barrierefreiheit",
+    "E-Commerce"
+  ],
+  "zeitraum": "3 Tage",
+  "rolle": "Konzeption und Umsetzung",
+  "demo": {
+    "verfuegbar": true,
+    "oeffentlich": false,
+    "hinweis": "Zugang auf Anfrage"
+  },
+  "repository": null,
+  "titelbild": "medien/titelbild.svg",
+  "kunde": {
+    "nennung_erlaubt": false,
+    "bezeichnung_anonym": "Einzelhändler aus der Region"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "VORNAME NACHNAME",
+  "aliase": [
+    {
+      "anzeige": "anzeigename",
+      "plattform": "GitHub",
+      "url": null
+    },
+    {
+      "anzeige": "anzeigename",
+      "plattform": "Mastodon",
+      "url": null
+    }
+  ],
+  "kurzprofil": "Kurzvorstellung als Fließtext, drei bis vier Zeilen. Serif für alles, was gelesen wird; Mono für alles, was strukturiert ist. Bitte in site.config.json durch den echten Text ersetzen.",
+  "hinweis": "Optionaler Hinweisabsatz — zum Beispiel, welche Art von Projekten hier dokumentiert wird und was ausdrücklich nicht.",
+  "verfuegbarkeit": {
+    "anzeigen": true,
+    "text": "verfügbarkeit: text aus der konfiguration"
+  },
+  "kontakt": {
+    "email": "adresse@example.dev"
+  },
+  "impressum": {
+    "name": "Vorname Nachname",
+    "anschrift": "Straße und Hausnummer, Postleitzahl Ort",
+    "email": "adresse@example.dev"
+  }
+}

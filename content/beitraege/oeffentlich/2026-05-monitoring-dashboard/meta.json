@@ -1,0 +1,18 @@
+{
+  "titel": "Monitoring-Dashboard",
+  "datum": "2026-05-28",
+  "typ": "projekt",
+  "status": "abgeschlossen",
+  "kurzbeschreibung": "Kurzbeschreibung mit Verweis auf ein Repository.",
+  "stack": [
+    "Docker",
+    "nginx"
+  ],
+  "themen": [],
+  "zeitraum": "1 Woche",
+  "rolle": "Konzeption und Umsetzung",
+  "demo": null,
+  "repository": "https://github.com/vorname-nachname/beispiel-repo",
+  "titelbild": "medien/titelbild.svg",
+  "kunde": null
+}

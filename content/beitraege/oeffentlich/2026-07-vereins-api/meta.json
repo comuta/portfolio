@@ -1,0 +1,27 @@
+{
+  "titel": "API-Migration für eine Vereinsverwaltung",
+  "datum": "2026-07-02",
+  "typ": "projekt",
+  "status": "laufend",
+  "kurzbeschreibung": "Kunde anonymisiert. Demo vorhanden, Zugang auf Anfrage.",
+  "stack": [
+    "Python",
+    "Pydantic"
+  ],
+  "themen": [
+    "Verwaltung"
+  ],
+  "zeitraum": "laufend seit Juli 2026",
+  "rolle": "Umsetzung",
+  "demo": {
+    "verfuegbar": true,
+    "oeffentlich": false,
+    "hinweis": "Zugang auf Anfrage"
+  },
+  "repository": null,
+  "titelbild": null,
+  "kunde": {
+    "nennung_erlaubt": false,
+    "bezeichnung_anonym": "Verein aus der Region"
+  }
+}

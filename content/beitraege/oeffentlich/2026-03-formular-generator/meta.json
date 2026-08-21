@@ -1,0 +1,19 @@
+{
+  "titel": "Formular-Generator",
+  "datum": "2026-03-04",
+  "typ": "projekt",
+  "status": "abgeschlossen",
+  "kurzbeschreibung": "Kurzbeschreibung, eine Zeile.",
+  "stack": [
+    "Flask"
+  ],
+  "themen": [
+    "Verwaltung"
+  ],
+  "zeitraum": "2 Tage",
+  "rolle": "Umsetzung",
+  "demo": null,
+  "repository": null,
+  "titelbild": null,
+  "kunde": null
+}
