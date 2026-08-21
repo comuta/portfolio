@@ -1,7 +1,7 @@
 import math
 from pathlib import Path
 
-from flask import Blueprint, abort, current_app, render_template, request, send_from_directory
+from flask import Blueprint, Response, abort, current_app, render_template, request, send_from_directory
 
 from . import content
 
@@ -161,3 +161,34 @@ def project_medium(slug, dateiname):
         abort(404)
 
     return send_from_directory(medien_dir, dateiname)
+
+
+@public.route("/feed.xml")
+def feed():
+    projects = content.list_projects(_content_dir())[:20]
+    xml = render_template("feed.xml", projects=projects)
+    return Response(xml, mimetype="application/atom+xml")
+
+
+@public.app_errorhandler(404)
+def not_found(error):
+    return render_template(
+        "error.html",
+        code=404,
+        title="Diese Seite gibt es nicht.",
+        message=(
+            "Der angeforderte Beitrag existiert nicht oder ist nicht öffentlich. "
+            "Ein unbekannter Slug wird nie in einen Dateipfad eingesetzt."
+        ),
+    ), 404
+
+
+@public.app_errorhandler(500)
+def server_error(error):
+    current_app.logger.exception("internal server error")
+    return render_template(
+        "error.html",
+        code=500,
+        title="Etwas ist schiefgelaufen.",
+        message="Der Fehler wurde protokolliert. Bitte versuchen Sie es später erneut.",
+    ), 500

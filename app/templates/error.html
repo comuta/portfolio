@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}{{ code }} — {{ super() }}{% endblock %}
+
+{% block footer_note %}fehler protokolliert · kein stacktrace{% endblock %}
+
+{% block content %}
+  <div class="error-page">
+    <div class="error-page__code">{{ code }}</div>
+    <div class="error-page__title">{{ title }}</div>
+    <p class="prose error-page__message">{{ message }}</p>
+    <div class="error-page__actions">
+      <a class="button button--primary" href="/">zur startseite</a>
+      <a class="button" href="/projekte">alle projekte</a>
+    </div>
+  </div>
+{% endblock %}
