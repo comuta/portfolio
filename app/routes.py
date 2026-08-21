@@ -126,6 +126,18 @@ def about():
     return render_template("about.html", body_html=body_html, portrait_ext=_find_portrait_ext())
 
 
+@public.route("/impressum")
+def imprint():
+    body_html = content.load_page(_content_dir(), "impressum")
+    return render_template("legal_page.html", title="Impressum", body_html=body_html)
+
+
+@public.route("/datenschutz")
+def privacy():
+    body_html = content.load_page(_content_dir(), "datenschutz")
+    return render_template("legal_page.html", title="Datenschutzerklärung", body_html=body_html)
+
+
 @public.route("/ueber-mich/portrait.<ext>")
 def about_portrait(ext):
     if ext not in PORTRAIT_EXTENSIONS:
