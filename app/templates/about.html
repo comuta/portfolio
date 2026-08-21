@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}/über-mich — {{ super() }}{% endblock %}
+
+{% block content %}
+  <h1>/über-mich</h1>
+  <div class="two-col">
+    <div class="prose">
+      {% if body_html %}
+        {{ body_html | safe }}
+      {% else %}
+        <p>Noch kein Inhalt hinterlegt.</p>
+      {% endif %}
+    </div>
+
+    <aside class="sidebar" aria-label="Zusatzinformationen">
+      {% if portrait_ext %}
+        <img class="portrait" src="/ueber-mich/portrait.{{ portrait_ext }}" alt="Porträtfoto" width="600" height="800">
+      {% endif %}
+
+      {% if site_config %}
+        <div>
+          <div class="eyebrow">kontakt &amp; aliase</div>
+          <ul class="plain-list">
+            <li><a class="alias-link" href="mailto:{{ site_config.kontakt.email }}">{{ site_config.kontakt.email }}</a></li>
+            {% for alias in site_config.aliase %}
+              <li>
+                {% if alias.url %}
+                  <a class="alias-link" href="{{ alias.url }}">{{ alias.plattform | lower }}/{{ alias.anzeige }}</a>
+                {% else %}
+                  {{ alias.plattform | lower }}/{{ alias.anzeige }}
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+    </aside>
+  </div>
+{% endblock %}

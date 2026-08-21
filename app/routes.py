@@ -8,10 +8,19 @@ from . import content
 public = Blueprint("public", __name__)
 
 PROJECTS_PAGE_SIZE = 5
+PORTRAIT_EXTENSIONS = ("jpg", "jpeg", "png", "webp")
 
 
 def _content_dir() -> str:
     return current_app.config["CONTENT_DIR"]
+
+
+def _find_portrait_ext() -> str | None:
+    seiten = Path(_content_dir()) / "seiten"
+    for ext in PORTRAIT_EXTENSIONS:
+        if (seiten / f"portrait.{ext}").is_file():
+            return ext
+    return None
 
 
 def _current_page() -> int:
@@ -109,6 +118,25 @@ def project_detail(slug):
 @public.route("/notizen")
 def notes():
     return render_template("notes.html", notes=content.list_notes(_content_dir()))
+
+
+@public.route("/ueber-mich")
+def about():
+    body_html = content.load_page(_content_dir(), "ueber-mich")
+    return render_template("about.html", body_html=body_html, portrait_ext=_find_portrait_ext())
+
+
+@public.route("/ueber-mich/portrait.<ext>")
+def about_portrait(ext):
+    if ext not in PORTRAIT_EXTENSIONS:
+        abort(404)
+
+    seiten = (Path(_content_dir()) / "seiten").resolve()
+    ziel = (seiten / f"portrait.{ext}").resolve()
+    if not ziel.is_relative_to(seiten) or not ziel.is_file():
+        abort(404)
+
+    return send_from_directory(seiten, f"portrait.{ext}")
 
 
 @public.route("/projekte/<slug>/medien/<path:dateiname>")
