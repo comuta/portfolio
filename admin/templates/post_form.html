@@ -8,6 +8,22 @@
     {% if visibility %}<span class="tag">{{ visibility }}</span>{% endif %}
   </div>
 
+  {% if dir_name %}
+    <fieldset>
+      <legend>Medien hochladen</legend>
+      <form method="post" data-upload-form action="/beitraege/{{ dir_name }}/medien/hochladen" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label>Bilddatei (png, jpg, webp, gif)
+          <input type="file" name="datei" accept="image/png,image/jpeg,image/webp,image/gif" required>
+        </label>
+        <button type="submit" class="button">Hochladen</button>
+        <div data-upload-status></div>
+      </form>
+    </fieldset>
+  {% else %}
+    <p class="eyebrow">Medien-Upload steht nach dem ersten Speichern zur Verfügung.</p>
+  {% endif %}
+
   <form method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 

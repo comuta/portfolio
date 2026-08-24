@@ -36,3 +36,60 @@ function setupMarkdownPreview() {
 }
 
 document.addEventListener("DOMContentLoaded", setupMarkdownPreview);
+
+function setupMediaUpload() {
+  const form = document.querySelector("[data-upload-form]");
+  if (!form) return;
+
+  const fileInput = form.querySelector('input[type="file"]');
+  const status = document.querySelector("[data-upload-status]");
+  const textarea = document.querySelector("[data-markdown-source]");
+  const titelbildInput = document.querySelector('input[name="titelbild"]');
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    if (!fileInput.files.length) return;
+
+    const body = new FormData();
+    body.append("csrf_token", form.querySelector('input[name="csrf_token"]').value);
+    body.append("datei", fileInput.files[0]);
+
+    status.textContent = "Lädt hoch …";
+    fetch(form.action, { method: "POST", body })
+      .then((resp) => resp.json().then((data) => ({ ok: resp.ok, data })))
+      .then(({ ok, data }) => {
+        if (!ok) {
+          status.textContent = "Fehler: " + (data.error || "Upload fehlgeschlagen.");
+          return;
+        }
+        status.textContent = "";
+        const pfad = data.pfad;
+
+        const insertBtn = document.createElement("button");
+        insertBtn.type = "button";
+        insertBtn.className = "button";
+        insertBtn.textContent = pfad + " → in Text einfügen";
+        insertBtn.addEventListener("click", () => {
+          if (!textarea) return;
+          textarea.value += `\n\n![Bildbeschreibung](${pfad})\n`;
+          textarea.dispatchEvent(new Event("input"));
+        });
+
+        const titelbildBtn = document.createElement("button");
+        titelbildBtn.type = "button";
+        titelbildBtn.className = "button";
+        titelbildBtn.textContent = "Als Titelbild setzen";
+        titelbildBtn.addEventListener("click", () => {
+          if (titelbildInput) titelbildInput.value = pfad;
+        });
+
+        status.append(insertBtn, document.createTextNode(" "), titelbildBtn);
+        fileInput.value = "";
+      })
+      .catch(() => {
+        status.textContent = "Fehler beim Hochladen.";
+      });
+  });
+}
+
+document.addEventListener("DOMContentLoaded", setupMediaUpload);

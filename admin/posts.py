@@ -9,6 +9,7 @@ from pydantic import ValidationError
 
 from shared import content
 
+from . import media
 from . import posts_repo as repo
 from . import storage, versioning
 from .auth import login_required
@@ -127,6 +128,28 @@ def delete_post(dir_name):
     versioning.commit_all(Path(content_dir), f"Beitrag in Papierkorb verschoben: {dir_name}")
     flash("Beitrag in den Papierkorb verschoben.", "success")
     return redirect("/")
+
+
+@bp.route("/beitraege/<dir_name>/medien/hochladen", methods=["POST"])
+@login_required
+def upload_media(dir_name):
+    content_dir = _content_dir()
+    found = repo.find_post_dir(content_dir, dir_name)
+    if found is None:
+        abort(404)
+    path, _visibility = found
+
+    file_storage = request.files.get("datei")
+    if file_storage is None:
+        return {"error": "Keine Datei übermittelt."}, 400
+
+    try:
+        filename = media.save_validated_image(file_storage, path / "medien")
+    except media.UploadError as exc:
+        return {"error": str(exc)}, 400
+
+    versioning.commit_all(Path(content_dir), f"Medium hochgeladen: {dir_name}/medien/{filename}")
+    return {"pfad": f"medien/{filename}"}
 
 
 @bp.route("/vorschau", methods=["POST"])
