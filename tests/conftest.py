@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from app import create_app
+from web import create_app
 
 
 def write_post(base: Path, dir_name: str, meta: dict, inhalt: str = "Text.") -> Path:

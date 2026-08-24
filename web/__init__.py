@@ -26,7 +26,9 @@ def create_app(content_dir: str | None = None) -> Flask:
         referrer_policy="same-origin",
     )
 
-    from . import content, routes
+    from shared import content
+
+    from . import routes
 
     app.register_blueprint(routes.public)
 

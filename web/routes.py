@@ -3,7 +3,7 @@ from pathlib import Path
 
 from flask import Blueprint, Response, abort, current_app, render_template, request, send_from_directory
 
-from . import content
+from shared import content
 
 public = Blueprint("public", __name__)
 

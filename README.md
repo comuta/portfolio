@@ -12,7 +12,7 @@ vorhanden) für die vollständigen Anforderungen; diese Anwendung deckt den
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements-dev.txt
-flask --app wsgi run --debug
+flask --app wsgi_web run --debug
 ```
 
 Die Anwendung liest Inhalte aus `./content` (überschreibbar über die

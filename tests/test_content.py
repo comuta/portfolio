@@ -1,6 +1,6 @@
 import json
 
-from app import content
+from shared import content
 from tests.conftest import write_post
 
 
