@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Papierkorb — {{ super() }}{% endblock %}
+
+{% block content %}
+  <h1>Papierkorb</h1>
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">gelöscht am</th>
+        <th scope="col">sichtbarkeit</th>
+        <th scope="col">beitrag</th>
+        <th scope="col">aktionen</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for entry in entries %}
+        <tr>
+          <td>{{ entry.stamp }}</td>
+          <td><span class="tag">{{ entry.visibility }}</span></td>
+          <td>{{ entry.dir_name }}</td>
+          <td class="actions-cell">
+            {% if entry.restorable %}
+              <form method="post" action="/papierkorb/{{ entry.raw_name }}/wiederherstellen" class="inline-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="button">wiederherstellen</button>
+              </form>
+            {% endif %}
+            <form method="post" action="/papierkorb/{{ entry.raw_name }}/endgueltig-loeschen" class="inline-form" data-confirm="Endgültig löschen? Das kann nicht rückgängig gemacht werden.">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="button button--danger">endgültig löschen</button>
+            </form>
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="4">Papierkorb ist leer.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
