@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Portfolio Admin{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <div class="wrap">
+    <header class="site-header">
+      <a class="site-header__name" href="/">portfolio · admin</a>
+      {% if session.get("user") %}
+        <nav aria-label="Hauptnavigation">
+          <ul class="site-nav">
+            <li><a href="/">beiträge</a></li>
+            <li><a href="/seiten/ueber-mich">seiten</a></li>
+            <li><a href="/einstellungen">einstellungen</a></li>
+            <li><a href="/papierkorb">papierkorb</a></li>
+            <li><a href="/logout">abmelden ({{ session.get("user") }})</a></li>
+          </ul>
+        </nav>
+      {% endif %}
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flash-list">
+          {% for category, message in messages %}
+            <li class="flash flash--{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <main class="site-main">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</body>
+</html>
