@@ -67,9 +67,10 @@ def create_app(content_dir: str | None = None) -> Flask:
         seed_from=os.environ.get("SEED_CONTENT_DIR"),
     )
 
-    from . import auth, cli
+    from . import auth, cli, posts
 
     app.register_blueprint(auth.bp)
+    app.register_blueprint(posts.bp)
     cli.register(app)
 
     return app

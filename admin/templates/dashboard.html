@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Beiträge — {{ super() }}{% endblock %}
+
+{% block content %}
+  <div class="listing-head">
+    <h1>Beiträge</h1>
+    <a class="button button--primary" href="/beitraege/neu">+ neuer Beitrag</a>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">datum</th>
+        <th scope="col">titel</th>
+        <th scope="col">typ</th>
+        <th scope="col">sichtbarkeit</th>
+        <th scope="col">aktionen</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for entry in entries %}
+        <tr>
+          {% if entry.post %}
+            <td>{{ entry.post.datum }}</td>
+            <td><a href="/beitraege/{{ entry.dir_name }}/bearbeiten">{{ entry.post.titel }}</a></td>
+            <td>{{ entry.post.typ }}</td>
+          {% else %}
+            <td colspan="3" class="text-danger">{{ entry.dir_name }} — Fehler: {{ entry.error }}</td>
+          {% endif %}
+          <td><span class="tag">{{ entry.visibility }}</span></td>
+          <td class="actions-cell">
+            {% if entry.visibility == "privat" %}
+              <form method="post" action="/beitraege/{{ entry.dir_name }}/veroeffentlichen" class="inline-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="button">veröffentlichen</button>
+              </form>
+            {% else %}
+              <form method="post" action="/beitraege/{{ entry.dir_name }}/zurueckziehen" class="inline-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="button">zurückziehen</button>
+              </form>
+            {% endif %}
+            <form method="post" action="/beitraege/{{ entry.dir_name }}/loeschen" class="inline-form" data-confirm="In den Papierkorb verschieben?">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="button button--danger">löschen</button>
+            </form>
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="5">Noch keine Beiträge.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

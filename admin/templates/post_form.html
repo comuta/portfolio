@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}{{ "Beitrag bearbeiten" if dir_name else "Neuer Beitrag" }} — {{ super() }}{% endblock %}
+
+{% block content %}
+  <div class="listing-head">
+    <h1>{{ "Beitrag bearbeiten: " ~ dir_name if dir_name else "Neuer Beitrag" }}</h1>
+    {% if visibility %}<span class="tag">{{ visibility }}</span>{% endif %}
+  </div>
+
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="form-row">
+      <label>Titel
+        <input type="text" name="titel" value="{{ values.get('titel', '') }}" required>
+      </label>
+      <label>Datum
+        <input type="date" name="datum" value="{{ values.get('datum', '') }}" required>
+      </label>
+    </div>
+
+    <div class="form-row">
+      <label>Typ
+        <select name="typ">
+          <option value="projekt" {% if values.get('typ', 'projekt') == 'projekt' %}selected{% endif %}>projekt</option>
+          <option value="notiz" {% if values.get('typ') == 'notiz' %}selected{% endif %}>notiz</option>
+        </select>
+      </label>
+      <label>Status
+        <select name="status">
+          <option value="">—</option>
+          <option value="abgeschlossen" {% if values.get('status') == 'abgeschlossen' %}selected{% endif %}>abgeschlossen</option>
+          <option value="laufend" {% if values.get('status') == 'laufend' %}selected{% endif %}>laufend</option>
+        </select>
+      </label>
+    </div>
+
+    <label>Kurzbeschreibung
+      <textarea name="kurzbeschreibung" rows="2">{{ values.get('kurzbeschreibung', '') }}</textarea>
+    </label>
+
+    <div class="form-row">
+      <label>Stack (kommagetrennt)
+        <input type="text" name="stack" value="{{ values.get('stack', '') }}">
+      </label>
+      <label>Themen (kommagetrennt)
+        <input type="text" name="themen" value="{{ values.get('themen', '') }}">
+      </label>
+    </div>
+
+    <div class="form-row">
+      <label>Zeitraum
+        <input type="text" name="zeitraum" value="{{ values.get('zeitraum', '') }}">
+      </label>
+      <label>Rolle
+        <input type="text" name="rolle" value="{{ values.get('rolle', '') }}">
+      </label>
+    </div>
+
+    <fieldset>
+      <legend>Demo</legend>
+      <label class="checkbox-label">
+        <input type="checkbox" name="demo_verfuegbar" {% if values.get('demo_verfuegbar') %}checked{% endif %}> verfügbar
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" name="demo_oeffentlich" {% if values.get('demo_oeffentlich') %}checked{% endif %}> öffentlich zugänglich
+      </label>
+      <label>Hinweis
+        <input type="text" name="demo_hinweis" value="{{ values.get('demo_hinweis', '') }}">
+      </label>
+    </fieldset>
+
+    <label>Repository-URL
+      <input type="url" name="repository" value="{{ values.get('repository', '') }}">
+    </label>
+
+    <label>Titelbild (relativer Pfad, z. B. medien/bild.png — Upload folgt in Kürze)
+      <input type="text" name="titelbild" value="{{ values.get('titelbild', '') }}">
+    </label>
+
+    <fieldset>
+      <legend>Kunde</legend>
+      <label class="checkbox-label">
+        <input type="checkbox" name="kunde_nennung_erlaubt" {% if values.get('kunde_nennung_erlaubt') %}checked{% endif %}> Nennung erlaubt
+      </label>
+      <label>Name (nur ausgegeben, wenn Nennung erlaubt)
+        <input type="text" name="kunde_name" value="{{ values.get('kunde_name', '') }}">
+      </label>
+      <label>Anonyme Bezeichnung
+        <input type="text" name="kunde_bezeichnung_anonym" value="{{ values.get('kunde_bezeichnung_anonym', '') }}">
+      </label>
+    </fieldset>
+
+    <label>Inhalt (Markdown)
+      <textarea name="inhalt" rows="16" data-markdown-source>{{ inhalt }}</textarea>
+    </label>
+
+    <div class="markdown-preview-wrap">
+      <div class="eyebrow">Vorschau</div>
+      <div class="markdown-preview" data-markdown-preview></div>
+    </div>
+
+    <button type="submit" class="button button--primary">Speichern</button>
+  </form>
+{% endblock %}

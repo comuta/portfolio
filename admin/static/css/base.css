@@ -220,3 +220,70 @@ thead th {
     grid-template-columns: 1fr;
   }
 }
+
+.text-danger {
+  color: var(--color-danger);
+}
+
+.checkbox-label {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+fieldset {
+  border: 1px solid var(--color-border);
+  padding: 0.9rem 1rem 1.1rem;
+  margin: 0 0 1.25rem;
+}
+
+legend {
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  padding: 0 0.4rem;
+}
+
+.markdown-preview-wrap {
+  margin-bottom: 1.25rem;
+}
+
+.markdown-preview {
+  border: 1px solid var(--color-border);
+  padding: 0.9rem 1rem;
+  background: var(--color-surface);
+  min-height: 4rem;
+}
+
+.markdown-preview :first-child {
+  margin-top: 0;
+}
+
+.listing-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.listing-head h1 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.actions-cell {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.eyebrow {
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 0.4rem;
+}
