@@ -1,0 +1,107 @@
+# Two independent services from one shared image (AE-06), no reverse proxy
+# here — that's the host nginx already in front of the server per AE-01,
+# out of scope for this repo. Both bind to 127.0.0.1 only (AE-01a): Docker
+# writes its own iptables rules that bypass ufw, so the loopback prefix here
+# is the actual access control, not a firewall rule elsewhere.
+#
+# ./data is the runtime content directory (mirrors /var/lib/portfolio),
+# gitignored and separate from the demo content checked into ./content —
+# admin turns it into its own git repo (FA-41), which would conflict with
+# it also being tracked by this repo.
+#
+# Mounts are directory-granular, never a single bare file: Docker silently
+# creates a missing bind-mount source as an empty *directory*, which would
+# corrupt a file mount. site.config.json (the one file living directly at
+# the content-dir root) is guaranteed to exist before web/admin start by
+# the `init` service, which runs admin/bootstrap.py's ensure_content_dir()
+# against the same ./data mount first.
+
+services:
+  init:
+    build: .
+    # Root only for this one short-lived, non-network-facing step: if Docker
+    # auto-creates the ./data host directory (first run), it does so as
+    # root:root, and the portfolio user (uid 1000) that every other service
+    # runs as wouldn't be able to write into it otherwise. web/admin/
+    # admin-cli themselves never run as root.
+    user: "0:0"
+    entrypoint:
+      - sh
+      - -c
+      - >
+        python -c "from admin.bootstrap import ensure_content_dir;
+        ensure_content_dir('/data', seed_from='/seed-content')"
+        && chown -R 1000:1000 /data
+    environment:
+      SEED_CONTENT_DIR: /seed-content
+    volumes:
+      - ./content:/seed-content:ro
+      - ./data:/data:rw
+    security_opt:
+      - no-new-privileges:true
+
+  web:
+    build: .
+    command: gunicorn --bind 0.0.0.0:8000 --workers 2 --access-logfile - wsgi_web:app
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    environment:
+      CONTENT_DIR: /data
+    volumes:
+      - ./data/beitraege/oeffentlich:/data/beitraege/oeffentlich:ro
+      - ./data/seiten:/data/seiten:ro
+      - ./data/site.config.json:/data/site.config.json:ro
+    ports:
+      - "127.0.0.1:8081:8000"
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+
+  admin:
+    build: .
+    # Single worker: the rate limiter's in-memory storage is per-process,
+    # so more workers would mean the login rate limit is only enforced
+    # per-worker instead of for the service as a whole.
+    command: gunicorn --bind 0.0.0.0:8000 --workers 1 --access-logfile - wsgi_admin:app
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    environment:
+      CONTENT_DIR: /data
+      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY must be set — see .env.example}
+      SEED_CONTENT_DIR: /seed-content
+    volumes:
+      - ./content:/seed-content:ro
+      - ./data/beitraege:/data/beitraege:rw
+      - ./data/seiten:/data/seiten:rw
+      - ./data/site.config.json:/data/site.config.json:rw
+      - ./data/.papierkorb:/data/.papierkorb:rw
+      # zugang/ (credentials) is read-only even here — the running admin
+      # service never gets a code path that can touch the password/TOTP
+      # secret. See the admin-cli profile below for account setup.
+      - ./data/zugang:/data/zugang:ro
+    ports:
+      - "127.0.0.1:8082:8000"
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+
+  # Not started by `docker compose up` (profile-gated). Run explicitly for
+  # one-off account setup/changes:
+  #   docker compose run --rm admin-cli flask --app wsgi_admin create-user
+  admin-cli:
+    build: .
+    profiles: ["cli"]
+    entrypoint: ["flask", "--app", "wsgi_admin"]
+    environment:
+      CONTENT_DIR: /data
+      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY must be set — see .env.example}
+    volumes:
+      - ./data/beitraege:/data/beitraege:rw
+      - ./data/seiten:/data/seiten:rw
+      - ./data/site.config.json:/data/site.config.json:rw
+      - ./data/.papierkorb:/data/.papierkorb:rw
+      - ./data/zugang:/data/zugang:rw
+    security_opt:
+      - no-new-privileges:true

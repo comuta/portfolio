@@ -28,8 +28,17 @@ def ensure_content_dir(content_dir: str, seed_from: str | None = None) -> None:
     for rel in _SKELETON:
         (base / rel).mkdir(parents=True, exist_ok=True)
 
-    if is_new and seed_from:
-        _seed(base, Path(seed_from))
+    seed_path = Path(seed_from) if seed_from else None
+
+    if is_new and seed_path:
+        _seed(base, seed_path)
+
+    # site.config.json lives alone at the content-dir root (not inside one of
+    # the _SKELETON directories), and Docker Compose bind-mounts it as a single
+    # file for both services. If the host path doesn't exist yet when a
+    # container starts, Docker silently creates it as an empty *directory*
+    # instead — so this file has to exist before that first mount happens.
+    _ensure_site_config(base, seed_path)
 
     versioning.ensure_repo(base)
 
@@ -45,3 +54,12 @@ def _seed(base: Path, seed_from: Path) -> None:
             shutil.copytree(item, target)
         else:
             shutil.copy2(item, target)
+
+
+def _ensure_site_config(base: Path, seed_from: Path | None) -> None:
+    target = base / "site.config.json"
+    if target.exists() or seed_from is None:
+        return
+    example = seed_from / "site.config.example.json"
+    if example.is_file():
+        shutil.copy2(example, target)
