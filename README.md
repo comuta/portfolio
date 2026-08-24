@@ -28,6 +28,16 @@ content/
 In Produktion liegt dieses Verzeichnis außerhalb des Repositories (Bind-Mount);
 für diese Demo ist es mit Platzhalterinhalten eingecheckt.
 
+`content/site.config.json` enthält echte personenbezogene Angaben (Name,
+Anschrift, E-Mail) und ist deshalb in `.gitignore` eingetragen — nicht Teil
+des Repositories. Vor dem ersten Start einmalig anlegen:
+
+```bash
+cp content/site.config.example.json content/site.config.json
+```
+
+und dann mit den echten Daten befüllen.
+
 ## Tests
 
 ```bash

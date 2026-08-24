@@ -7,3 +7,7 @@ venv/
 .DS_Store
 instance/
 .env
+
+# Private site config with real personal/legal data (name, address, email).
+# See content/site.config.example.json for the placeholder template.
+content/site.config.json
