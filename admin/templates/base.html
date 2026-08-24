@@ -18,7 +18,12 @@
             <li><a href="/seiten/ueber-mich">seiten</a></li>
             <li><a href="/einstellungen">einstellungen</a></li>
             <li><a href="/papierkorb">papierkorb</a></li>
-            <li><a href="/logout">abmelden ({{ session.get("user") }})</a></li>
+            <li>
+              <form method="post" action="/logout" class="inline-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="link-button">abmelden ({{ session.get("user") }})</button>
+              </form>
+            </li>
           </ul>
         </nav>
       {% endif %}

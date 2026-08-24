@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Anmelden — {{ super() }}{% endblock %}
+
+{% block content %}
+  <h1>Anmelden</h1>
+  <form method="post" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="next" value="{{ next_path }}">
+    <label>Benutzername
+      <input type="text" name="benutzername" autocomplete="username" required autofocus>
+    </label>
+    <label>Passwort
+      <input type="password" name="passwort" autocomplete="current-password" required>
+    </label>
+    <label>TOTP-Code
+      <input type="text" name="code" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" required>
+    </label>
+    <button type="submit" class="button button--primary">Anmelden</button>
+  </form>
+{% endblock %}
