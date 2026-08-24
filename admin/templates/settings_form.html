@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Einstellungen — {{ super() }}{% endblock %}
+
+{% block content %}
+  <h1>Einstellungen (site.config.json)</h1>
+
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <label>Name
+      <input type="text" name="name" value="{{ values.get('name', '') }}" required>
+    </label>
+
+    <label>Kurzprofil
+      <textarea name="kurzprofil" rows="3">{{ values.get('kurzprofil', '') }}</textarea>
+    </label>
+
+    <label>Hinweis (optional)
+      <textarea name="hinweis" rows="2">{{ values.get('hinweis', '') }}</textarea>
+    </label>
+
+    <fieldset>
+      <legend>Verfügbarkeit</legend>
+      <label class="checkbox-label">
+        <input type="checkbox" name="verfuegbarkeit_anzeigen" {% if values.get('verfuegbarkeit_anzeigen') %}checked{% endif %}> anzeigen
+      </label>
+      <label>Text
+        <input type="text" name="verfuegbarkeit_text" value="{{ values.get('verfuegbarkeit_text', '') }}">
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Kontakt</legend>
+      <label>E-Mail
+        <input type="email" name="kontakt_email" value="{{ values.get('kontakt_email', '') }}" required>
+      </label>
+      <label>PGP (optional)
+        <input type="text" name="kontakt_pgp" value="{{ values.get('kontakt_pgp', '') }}">
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Aliase (Online-Profile)</legend>
+      {% for i in range(6) %}
+        <div class="form-row form-row--three">
+          <label>Plattform
+            <input type="text" name="alias_plattform_{{ i }}" value="{{ values.get('alias_plattform_' ~ i, '') }}">
+          </label>
+          <label>Anzeigename
+            <input type="text" name="alias_anzeige_{{ i }}" value="{{ values.get('alias_anzeige_' ~ i, '') }}">
+          </label>
+          <label>URL (optional)
+            <input type="url" name="alias_url_{{ i }}" value="{{ values.get('alias_url_' ~ i, '') }}">
+          </label>
+        </div>
+      {% endfor %}
+    </fieldset>
+
+    <fieldset>
+      <legend>Impressum</legend>
+      <label>Name
+        <input type="text" name="impressum_name" value="{{ values.get('impressum_name', '') }}" required>
+      </label>
+      <label>Anschrift
+        <input type="text" name="impressum_anschrift" value="{{ values.get('impressum_anschrift', '') }}" required>
+      </label>
+      <label>E-Mail
+        <input type="email" name="impressum_email" value="{{ values.get('impressum_email', '') }}" required>
+      </label>
+      <label>Telefon (optional)
+        <input type="text" name="impressum_telefon" value="{{ values.get('impressum_telefon', '') }}">
+      </label>
+      <label>USt-IdNr. (optional)
+        <input type="text" name="impressum_ust_id" value="{{ values.get('impressum_ust_id', '') }}">
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" name="impressum_bestaetigt"> Ich bestätige die Änderungen am Impressum
+      </label>
+    </fieldset>
+
+    <button type="submit" class="button button--primary">Speichern</button>
+  </form>
+{% endblock %}

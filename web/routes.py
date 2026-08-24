@@ -8,7 +8,7 @@ from shared import content
 public = Blueprint("public", __name__)
 
 PROJECTS_PAGE_SIZE = 5
-PORTRAIT_EXTENSIONS = ("jpg", "jpeg", "png", "webp", "svg")
+PORTRAIT_EXTENSIONS = ("jpg", "jpeg", "png", "webp", "gif", "svg")
 
 
 def _content_dir() -> str:

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} — {{ super() }}{% endblock %}
+
+{% block content %}
+  <h1>{{ title }} bearbeiten</h1>
+
+  {% if name == "ueber-mich" %}
+    <fieldset>
+      <legend>Porträt</legend>
+      {% if portrait_ext %}<p>Aktuell hinterlegt: portrait.{{ portrait_ext }}</p>{% endif %}
+      <form method="post" data-upload-form action="/seiten/portrait/hochladen" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label>Neues Porträt (png, jpg, webp, gif)
+          <input type="file" name="datei" accept="image/png,image/jpeg,image/webp,image/gif" required>
+        </label>
+        <button type="submit" class="button">Hochladen</button>
+        <div data-upload-status></div>
+      </form>
+    </fieldset>
+  {% endif %}
+
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Inhalt (Markdown)
+      <textarea name="inhalt" rows="20" data-markdown-source>{{ inhalt }}</textarea>
+    </label>
+    <div class="markdown-preview-wrap">
+      <div class="eyebrow">Vorschau</div>
+      <div class="markdown-preview" data-markdown-preview></div>
+    </div>
+    <button type="submit" class="button button--primary">Speichern</button>
+  </form>
+{% endblock %}

@@ -64,26 +64,31 @@ function setupMediaUpload() {
         }
         status.textContent = "";
         const pfad = data.pfad;
+        status.append(`Hochgeladen: ${pfad}  `);
 
-        const insertBtn = document.createElement("button");
-        insertBtn.type = "button";
-        insertBtn.className = "button";
-        insertBtn.textContent = pfad + " → in Text einfügen";
-        insertBtn.addEventListener("click", () => {
-          if (!textarea) return;
-          textarea.value += `\n\n![Bildbeschreibung](${pfad})\n`;
-          textarea.dispatchEvent(new Event("input"));
-        });
+        if (textarea) {
+          const insertBtn = document.createElement("button");
+          insertBtn.type = "button";
+          insertBtn.className = "button";
+          insertBtn.textContent = "in Text einfügen";
+          insertBtn.addEventListener("click", () => {
+            textarea.value += `\n\n![Bildbeschreibung](${pfad})\n`;
+            textarea.dispatchEvent(new Event("input"));
+          });
+          status.append(insertBtn, document.createTextNode(" "));
+        }
 
-        const titelbildBtn = document.createElement("button");
-        titelbildBtn.type = "button";
-        titelbildBtn.className = "button";
-        titelbildBtn.textContent = "Als Titelbild setzen";
-        titelbildBtn.addEventListener("click", () => {
-          if (titelbildInput) titelbildInput.value = pfad;
-        });
+        if (titelbildInput) {
+          const titelbildBtn = document.createElement("button");
+          titelbildBtn.type = "button";
+          titelbildBtn.className = "button";
+          titelbildBtn.textContent = "Als Titelbild setzen";
+          titelbildBtn.addEventListener("click", () => {
+            titelbildInput.value = pfad;
+          });
+          status.append(titelbildBtn);
+        }
 
-        status.append(insertBtn, document.createTextNode(" "), titelbildBtn);
         fileInput.value = "";
       })
       .catch(() => {

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Seiten — {{ super() }}{% endblock %}
+
+{% block content %}
+  <h1>Seiten</h1>
+  <ul class="plain-list">
+    {% for name, title in pages %}
+      <li><a href="/seiten/{{ name }}">{{ title }}</a></li>
+    {% endfor %}
+  </ul>
+{% endblock %}
