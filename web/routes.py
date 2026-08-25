@@ -51,6 +51,15 @@ def _render_project_listing(all_projects, filtered_projects, active_label):
     )
 
 
+@public.route("/healthz")
+def healthz():
+    # For Docker's HEALTHCHECK/monitoring — cheap on purpose, just a stat()
+    # to catch a totally missing/unmounted content dir.
+    if not Path(_content_dir()).is_dir():
+        return "content dir missing", 503
+    return "ok", 200
+
+
 @public.route("/")
 def index():
     content_dir = _content_dir()

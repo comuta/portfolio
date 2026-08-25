@@ -46,3 +46,16 @@ def test_security_headers_are_present(client):
     assert resp.headers["X-Frame-Options"] == "DENY"
     assert resp.headers["X-Content-Type-Options"] == "nosniff"
     assert "Content-Security-Policy" in resp.headers
+
+
+def test_healthz_ok_when_content_dir_exists(client):
+    resp = client.get("/healthz")
+    assert resp.status_code == 200
+
+
+def test_healthz_503_when_content_dir_missing():
+    from web import create_app
+
+    app = create_app(content_dir="/does/not/exist")
+    resp = app.test_client().get("/healthz")
+    assert resp.status_code == 503

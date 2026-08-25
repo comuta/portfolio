@@ -57,6 +57,14 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    healthcheck:
+      # No curl/wget in python:3.12-slim; urllib is already there, so no
+      # extra package needed just for this.
+      test: ["CMD", "python", "-c", "import urllib.request as u, sys; sys.exit(0 if u.urlopen('http://127.0.0.1:8000/healthz', timeout=3).status == 200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   admin:
     build: .
@@ -92,6 +100,12 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u, sys; sys.exit(0 if u.urlopen('http://127.0.0.1:8000/healthz', timeout=3).status == 200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   # Not started by `docker compose up` (profile-gated). Run explicitly for
   # one-off account setup/changes:

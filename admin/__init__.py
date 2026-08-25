@@ -1,5 +1,6 @@
 import os
 from datetime import timedelta
+from pathlib import Path
 
 from flask import Flask
 from flask_limiter import Limiter
@@ -61,6 +62,16 @@ def create_app(content_dir: str | None = None) -> Flask:
     @app.route("/robots.txt")
     def robots():
         return "User-agent: *\nDisallow: /\n", 200, {"Content-Type": "text/plain"}
+
+    @app.route("/healthz")
+    def healthz():
+        # Deliberately not behind login_required — this is for Docker's
+        # HEALTHCHECK/monitoring, not an admin feature. Cheap on purpose: a
+        # stat() to catch a totally missing/unmounted content dir, nothing
+        # that touches posts or credentials.
+        if not Path(app.config["CONTENT_DIR"]).is_dir():
+            return "content dir missing", 503
+        return "ok", 200
 
     bootstrap.ensure_content_dir(
         app.config["CONTENT_DIR"],
