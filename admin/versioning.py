@@ -36,8 +36,16 @@ def commit_all(content_dir: Path, message: str) -> None:
 
 
 def _run(content_dir: Path, args: list[str], check: bool = True) -> subprocess.CompletedProcess:
+    # Bind-mounted content dirs routinely end up owned by a different uid than
+    # the one git sees itself running as (root creates it in the `init`
+    # container, a chown follows, host<->container uid mapping on Docker
+    # Desktop adds another layer) — git's "dubious ownership" check (safe by
+    # default for a shared multi-user machine) would otherwise refuse every
+    # command here. Scoping trust to exactly this one app-controlled path,
+    # per invocation, is safe: there's no other user on this container whose
+    # repo we could be tricked into trusting.
     result = subprocess.run(
-        ["git", "-C", str(content_dir), *args],
+        ["git", "-c", f"safe.directory={content_dir}", "-C", str(content_dir), *args],
         capture_output=True,
         text=True,
     )

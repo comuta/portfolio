@@ -73,6 +73,12 @@ services:
       SEED_CONTENT_DIR: /seed-content
     volumes:
       - ./content:/seed-content:ro
+      # .git lives at the content-dir root, not inside one of the mounted
+      # subdirectories below, so it needs its own explicit mount — without
+      # it, /data itself is just a container-native root-owned directory
+      # (only its children are real host mounts) and git can't create or
+      # see .git there at all.
+      - ./data/.git:/data/.git:rw
       - ./data/beitraege:/data/beitraege:rw
       - ./data/seiten:/data/seiten:rw
       - ./data/site.config.json:/data/site.config.json:rw
@@ -98,6 +104,7 @@ services:
       CONTENT_DIR: /data
       SECRET_KEY: ${SECRET_KEY:?SECRET_KEY must be set — see .env.example}
     volumes:
+      - ./data/.git:/data/.git:rw
       - ./data/beitraege:/data/beitraege:rw
       - ./data/seiten:/data/seiten:rw
       - ./data/site.config.json:/data/site.config.json:rw
