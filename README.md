@@ -136,6 +136,124 @@ analog zur bestehenden Pipeline eines anderen Projekts auf demselben Server.
 - Admin-Zugang bleibt weiterhin ein manueller, einmaliger Schritt auf dem
   Server: `docker compose run --rm admin-cli flask --app wsgi_admin create-user`.
 
+## Nginx als Reverse Proxy
+
+Kein Proxy im Compose-Stack (AE-01) — beide Container binden nur an
+`127.0.0.1` (AE-01a) und sind ohne einen vorgeschalteten Host-nginx von
+außen gar nicht erreichbar. Der nginx selbst ist **nicht** Teil dieses
+Repos und muss auf dem Server einmalig eingerichtet werden.
+
+| Hostname | Ziel | Besonderheit |
+|---|---|---|
+| `portfolio.wedel.dev` | `127.0.0.1:8091` (web) | Proxy-Cache (AE-03) |
+| `portfolio-admin.wedel.dev` | `127.0.0.1:8092` (admin) | HTTP Basic Auth zusätzlich zum App-Login (FA-21), `noindex` (FA-22) |
+
+**Basic-Auth-Datei einmalig anlegen** (zweiter, von der App unabhängiger
+Faktor vor dem Admin-Login):
+
+```bash
+sudo apt install apache2-utils   # für htpasswd, falls nicht vorhanden
+sudo htpasswd -c /etc/nginx/portfolio-admin.htpasswd admin
+```
+
+**`/etc/nginx/sites-available/portfolio.wedel.dev`** (öffentliche Seite):
+
+```nginx
+proxy_cache_path /var/cache/nginx/portfolio levels=1:2
+                  keys_zone=portfolio:10m max_size=200m inactive=24h;
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name portfolio.wedel.dev;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name portfolio.wedel.dev;
+
+    ssl_certificate     /etc/letsencrypt/live/wedel.dev/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/wedel.dev/privkey.pem;
+
+    location / {
+        proxy_pass http://127.0.0.1:8091;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # AE-03: übersteht einen Neustart/Absturz von `web` unsichtbar für
+        # Besucher — kurze Gültigkeit, weil Invalidieren nach einer Änderung
+        # sonst extra Aufwand wäre (FA-25).
+        proxy_cache portfolio;
+        proxy_cache_valid 200 60s;
+        proxy_cache_use_stale error timeout updating
+                               http_500 http_502 http_503 http_504;
+        proxy_cache_background_update on;
+        proxy_cache_lock on;
+    }
+}
+```
+
+**`/etc/nginx/sites-available/portfolio-admin.wedel.dev`** (Verwaltung):
+
+```nginx
+server {
+    listen 80;
+    listen [::]:80;
+    server_name portfolio-admin.wedel.dev;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name portfolio-admin.wedel.dev;
+
+    ssl_certificate     /etc/letsencrypt/live/wedel.dev/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/wedel.dev/privkey.pem;
+
+    # FA-22: nicht indexieren, keine Suchmaschine soll den Admin-Host verlinken.
+    add_header X-Robots-Tag "noindex, nofollow" always;
+
+    # FA-24: Obergrenze auch am Proxy, nicht nur in Flasks MAX_CONTENT_LENGTH.
+    client_max_body_size 20m;
+
+    location / {
+        auth_basic           "Portfolio Admin";
+        auth_basic_user_file /etc/nginx/portfolio-admin.htpasswd;
+
+        proxy_pass http://127.0.0.1:8092;
+        proxy_set_header Host $host;
+        # FA-21: genau ein Proxy-Hop — passend zu ProxyFix(x_for=1, x_proto=1,
+        # x_host=1) in admin/__init__.py. Ohne diese drei Header laufen
+        # Rate-Limiting und die `Secure`-Cookie-Prüfung hinter nginx ins Leere.
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+    }
+}
+```
+
+Aktivieren und laden:
+
+```bash
+sudo ln -s /etc/nginx/sites-available/portfolio.wedel.dev /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/portfolio-admin.wedel.dev /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+Zertifikate über certbot mit HTTP-01 (ein Wildcard-Zertifikat für
+`*.wedel.dev` deckt beide Hostnamen ab, da sie auf derselben Ebene liegen —
+siehe FA-22):
+
+```bash
+sudo certbot --nginx -d portfolio.wedel.dev -d portfolio-admin.wedel.dev
+```
+
+Eigene Domain(s) und Zertifikatspfade natürlich entsprechend anpassen.
+
 ## Lizenz
 
 Der Code steht unter der **GNU General Public License v3.0** (siehe
