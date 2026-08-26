@@ -98,3 +98,23 @@ function setupMediaUpload() {
 }
 
 document.addEventListener("DOMContentLoaded", setupMediaUpload);
+
+function setupAliasRows() {
+  const addButton = document.querySelector("[data-add-alias-row]");
+  const container = document.querySelector("[data-alias-rows]");
+  if (!addButton || !container) return;
+
+  addButton.addEventListener("click", () => {
+    const rows = container.querySelectorAll(".alias-row");
+    const lastRow = rows[rows.length - 1];
+    if (!lastRow) return;
+
+    const newRow = lastRow.cloneNode(true);
+    newRow.querySelectorAll("input").forEach((input) => {
+      input.value = "";
+    });
+    container.appendChild(newRow);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", setupAliasRows);

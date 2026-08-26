@@ -42,19 +42,22 @@
 
     <fieldset>
       <legend>Aliase (Online-Profile)</legend>
-      {% for i in range(6) %}
-        <div class="form-row form-row--three">
-          <label>Plattform
-            <input type="text" name="alias_plattform_{{ i }}" value="{{ values.get('alias_plattform_' ~ i, '') }}">
-          </label>
-          <label>Anzeigename
-            <input type="text" name="alias_anzeige_{{ i }}" value="{{ values.get('alias_anzeige_' ~ i, '') }}">
-          </label>
-          <label>URL (optional)
-            <input type="url" name="alias_url_{{ i }}" value="{{ values.get('alias_url_' ~ i, '') }}">
-          </label>
-        </div>
-      {% endfor %}
+      <div data-alias-rows>
+        {% for alias in values.get('aliase', []) %}
+          <div class="form-row form-row--three alias-row">
+            <label>Plattform
+              <input type="text" name="alias_plattform" value="{{ alias.plattform }}">
+            </label>
+            <label>Anzeigename
+              <input type="text" name="alias_anzeige" value="{{ alias.anzeige }}">
+            </label>
+            <label>URL (optional)
+              <input type="url" name="alias_url" value="{{ alias.url }}">
+            </label>
+          </div>
+        {% endfor %}
+      </div>
+      <button type="button" class="button" data-add-alias-row>+ weitere Zeile</button>
     </fieldset>
 
     <fieldset>

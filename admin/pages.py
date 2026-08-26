@@ -19,7 +19,10 @@ _PAGE_TITLES = {
     "ueber-mich": "Über mich",
 }
 _PORTRAIT_EXTENSIONS = ("jpg", "jpeg", "png", "webp", "gif")
-_MAX_ALIASES = 6
+# Blank rows appended after existing aliases so there's usually room to add
+# one or two more without needing the JS "+ weitere Zeile" button at all —
+# that button (admin.js) clones rows for anything beyond this.
+_SPARE_ALIAS_ROWS = 2
 
 
 def _content_dir() -> str:
@@ -87,31 +90,57 @@ def settings():
     if request.method == "POST":
         if _impressum_changed(existing, request.form) and not request.form.get("impressum_bestaetigt"):
             flash("Änderungen am Impressum müssen gesondert bestätigt werden (Häkchen unten im Formular).", "error")
-            return render_template("settings_form.html", values=request.form), 400
+            return render_template("settings_form.html", values=_error_form_values(request.form)), 400
 
         try:
             data = _parse_settings_form(request.form)
             config = content.SiteConfig.model_validate(data)
         except ValidationError as exc:
             flash(f"Ungültige Eingabe: {exc}", "error")
-            return render_template("settings_form.html", values=request.form), 400
+            return render_template("settings_form.html", values=_error_form_values(request.form)), 400
 
         storage.atomic_write_json(path, config.model_dump(mode="json"))
         versioning.commit_all(Path(content_dir), "site.config.json aktualisiert")
         flash("Einstellungen gespeichert.", "success")
         return redirect("/einstellungen")
 
-    values = _config_to_form_values(existing) if existing else {}
+    values = _config_to_form_values(existing) if existing else {"aliase": _blank_alias_rows(_SPARE_ALIAS_ROWS)}
     return render_template("settings_form.html", values=values)
+
+
+def _blank_alias_rows(count: int) -> list[dict]:
+    return [{"plattform": "", "anzeige": "", "url": ""} for _ in range(count)]
+
+
+def _alias_rows_from_form(form) -> list[dict]:
+    """Aliase are submitted as same-named repeated fields (alias_plattform,
+    alias_anzeige, alias_url), one triple per row — not indexed field names —
+    so there's no hardcoded row count on either the form or the server."""
+    plattformen = form.getlist("alias_plattform")
+    anzeigenamen = form.getlist("alias_anzeige")
+    urls = form.getlist("alias_url")
+    return [
+        {"plattform": p, "anzeige": a, "url": u}
+        for p, a, u in zip(plattformen, anzeigenamen, urls)
+    ]
+
+
+def _error_form_values(form) -> dict:
+    """Rebuild the values dict for re-rendering after a failed submission —
+    scalar fields survive via plain dict lookup, aliase need the same
+    row-reconstruction as a real save plus a couple of spare blank rows."""
+    values = form.to_dict()
+    values["aliase"] = _alias_rows_from_form(form) + _blank_alias_rows(_SPARE_ALIAS_ROWS)
+    return values
 
 
 def _parse_settings_form(form) -> dict:
     aliase = []
-    for i in range(_MAX_ALIASES):
-        anzeige = form.get(f"alias_anzeige_{i}", "").strip()
-        plattform = form.get(f"alias_plattform_{i}", "").strip()
-        url = form.get(f"alias_url_{i}", "").strip() or None
-        if anzeige or plattform:
+    for row in _alias_rows_from_form(form):
+        plattform = row["plattform"].strip()
+        anzeige = row["anzeige"].strip()
+        url = row["url"].strip() or None
+        if plattform or anzeige:
             aliase.append({"anzeige": anzeige, "plattform": plattform, "url": url})
 
     return {
@@ -152,11 +181,9 @@ def _config_to_form_values(config: content.SiteConfig) -> dict:
         "impressum_telefon": config.impressum.telefon or "",
         "impressum_ust_id": config.impressum.ust_id or "",
     }
-    for i in range(_MAX_ALIASES):
-        alias = config.aliase[i] if i < len(config.aliase) else None
-        values[f"alias_plattform_{i}"] = alias.plattform if alias else ""
-        values[f"alias_anzeige_{i}"] = alias.anzeige if alias else ""
-        values[f"alias_url_{i}"] = (alias.url or "") if alias else ""
+    values["aliase"] = [
+        {"plattform": a.plattform, "anzeige": a.anzeige, "url": a.url or ""} for a in config.aliase
+    ] + _blank_alias_rows(_SPARE_ALIAS_ROWS)
     return values
 
 
