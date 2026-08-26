@@ -8,6 +8,8 @@ from shared import content
 public = Blueprint("public", __name__)
 
 PROJECTS_PAGE_SIZE = 5
+FEED_DEFAULT_LIMIT = 20
+FEED_MAX_LIMIT = 100
 PORTRAIT_EXTENSIONS = ("jpg", "jpeg", "png", "webp", "gif", "svg")
 
 
@@ -174,8 +176,22 @@ def project_medium(slug, dateiname):
 
 @public.route("/feed.xml")
 def feed():
-    projects = content.list_projects(_content_dir())[:20]
-    xml = render_template("feed.xml", projects=projects)
+    # Notizen was previously missing entirely, despite /notizen linking here
+    # as "its" feed — both belong, sorted together chronologically like the
+    # Startseite's "letzte einträge" table.
+    entries = sorted(
+        content.list_projects(_content_dir()) + content.list_notes(_content_dir()),
+        key=lambda item: item.datum,
+        reverse=True,
+    )
+
+    try:
+        limit = int(request.args.get("limit", FEED_DEFAULT_LIMIT))
+    except ValueError:
+        limit = FEED_DEFAULT_LIMIT
+    limit = max(1, min(limit, FEED_MAX_LIMIT))
+
+    xml = render_template("feed.xml", entries=entries[:limit])
     return Response(xml, mimetype="application/atom+xml")
 
 

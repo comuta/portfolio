@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <title>{{ site_config.name if site_config else "Portfolio" }} — Projekte</title>
+  <title>{{ site_config.name if site_config else "Portfolio" }} — Projekte &amp; Notizen</title>
   <id>{{ request.host_url }}</id>
   <link href="{{ request.host_url }}"/>
   <link href="{{ request.url }}" rel="self"/>
-  <updated>{{ (projects[0].datum.isoformat() ~ "T00:00:00Z") if projects else "1970-01-01T00:00:00Z" }}</updated>
-  {% for project in projects %}
+  <updated>{{ (entries[0].datum.isoformat() ~ "T00:00:00Z") if entries else "1970-01-01T00:00:00Z" }}</updated>
+  {% for item in entries %}
+  {% set item_url = (request.host_url ~ "projekte/" ~ item.slug ~ "/") if item.typ == "projekt" else (request.host_url ~ "notizen#" ~ item.slug) %}
   <entry>
-    <title>{{ project.titel }}</title>
-    <id>{{ request.host_url }}projekte/{{ project.slug }}/</id>
-    <link href="{{ request.host_url }}projekte/{{ project.slug }}/"/>
-    <updated>{{ project.datum.isoformat() }}T00:00:00Z</updated>
-    <summary>{{ project.kurzbeschreibung }}</summary>
+    <title>{{ item.titel }}</title>
+    <id>{{ item_url }}</id>
+    <link href="{{ item_url }}"/>
+    <updated>{{ item.datum.isoformat() }}T00:00:00Z</updated>
+    <summary type="html">{{ item.kurzbeschreibung if item.kurzbeschreibung else item.content_html }}</summary>
   </entry>
   {% endfor %}
 </feed>
