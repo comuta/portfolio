@@ -136,11 +136,16 @@ analog zur bestehenden Pipeline eines anderen Projekts auf demselben Server.
 - Admin-Zugang bleibt weiterhin ein manueller, einmaliger Schritt auf dem
   Server: `docker compose run --rm admin-cli flask --app wsgi_admin create-user`.
 
-## Lizenzhinweis zu einzelnen Assets
+## Lizenz
 
-Die Icons unter `web/static/icons/` (und ggf. `admin/static/icons/`) sind
-**nur für den persönlichen Gebrauch auf dieser Website lizenziert** — anders
-als der übrige Code hier sind sie **nicht** zur Weiterverwendung oder
-Weitergabe freigegeben. Wichtig, falls dieses Repository (oder Teile davon)
-irgendwann als Vorlage/Open-Source-Grundgerüst weitergegeben werden: diese
-Dateien vorher entfernen bzw. durch frei lizenzierte Icons ersetzen.
+Der Code steht unter der **GNU General Public License v3.0** (siehe
+[`LICENSE`](LICENSE)) — frei nutzbar, veränderbar und weiterverbreitbar unter
+den GPLv3-Bedingungen.
+
+**Ausnahme:** Die Logo-/Icon-Dateien unter `web/static/icons/` und
+`admin/static/icons/` (`logo.svg`, `logo-mono.svg`, `favicon.svg`,
+`banner.svg`) sind **nicht** Teil dieser Lizenz — eigenes Artwork, alle Rechte
+vorbehalten. Details siehe [`NOTICE`](NOTICE). Wichtig, falls dieses
+Repository (oder Teile davon) irgendwann als Vorlage/Open-Source-Grundgerüst
+weitergegeben werden: diese Dateien vorher entfernen bzw. durch frei
+lizenzierte Icons ersetzen.

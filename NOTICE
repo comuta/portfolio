@@ -1,0 +1,26 @@
+Copyright (C) 2026 Michael Wedel
+
+This program's source code is free software: you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version. See LICENSE for the
+full license text.
+
+Exception — logo and icon assets:
+
+The following files are NOT covered by the GPLv3 license above. They
+are original artwork, all rights reserved; no permission is granted to
+copy, modify, or redistribute them:
+
+  web/static/icons/logo.svg
+  web/static/icons/logo-mono.svg
+  web/static/icons/favicon.svg
+  web/static/icons/banner.svg
+  admin/static/icons/logo.svg
+  admin/static/icons/logo-mono.svg
+  admin/static/icons/favicon.svg
+  admin/static/icons/banner.svg
+
+Everything else in this repository — application code, templates,
+stylesheets (including logo-tokens.css), tests, and configuration — is
+licensed under the GPLv3 as normal.
