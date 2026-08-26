@@ -4,10 +4,15 @@
 # writes its own iptables rules that bypass ufw, so the loopback prefix here
 # is the actual access control, not a firewall rule elsewhere.
 #
-# ./data is the runtime content directory (mirrors /var/lib/portfolio),
-# gitignored and separate from the demo content checked into ./content —
-# admin turns it into its own git repo (FA-41), which would conflict with
-# it also being tracked by this repo.
+# DATA_DIR is the runtime content directory, defaulting to ./data for local
+# dev — separate from the demo content checked into ./content, gitignored,
+# and its own git repo (FA-41), which would conflict with it also being
+# tracked by this repo. In production it MUST point outside any directory
+# that a CI/deploy checkout can recreate or clean: containers write into it
+# as uid 1000, and a checkout tool running as a different host user (e.g. a
+# GitHub Actions runner service account) then can't remove those files
+# during its own housekeeping — set DATA_DIR=/var/lib/portfolio (the path
+# the Anforderungskatalog itself specifies) in the deploy env file.
 #
 # web's mounts are directory-granular (FA-12: it must not even see privat/
 # or zugang/). admin/admin-cli mount the whole ./data tree at once instead,
@@ -49,7 +54,7 @@ services:
       SEED_CONTENT_DIR: /seed-content
     volumes:
       - ./content:/seed-content:ro
-      - ./data:/data:rw
+      - ${DATA_DIR:-./data}:/data:rw
     security_opt:
       - no-new-privileges:true
 
@@ -62,9 +67,9 @@ services:
     environment:
       CONTENT_DIR: /data
     volumes:
-      - ./data/beitraege/oeffentlich:/data/beitraege/oeffentlich:ro
-      - ./data/seiten:/data/seiten:ro
-      - ./data/site.config.json:/data/site.config.json:ro
+      - ${DATA_DIR:-./data}/beitraege/oeffentlich:/data/beitraege/oeffentlich:ro
+      - ${DATA_DIR:-./data}/seiten:/data/seiten:ro
+      - ${DATA_DIR:-./data}/site.config.json:/data/site.config.json:ro
     ports:
       - "127.0.0.1:8091:8000"
     security_opt:
@@ -94,14 +99,14 @@ services:
       SEED_CONTENT_DIR: /seed-content
     volumes:
       - ./content:/seed-content:ro
-      - ./data:/data:rw
+      - ${DATA_DIR:-./data}:/data:rw
       # zugang/ (credentials) is read-only even here — the running admin
       # service never gets a code path that can touch the password/TOTP
       # secret. Bind-mounted on top of the broad mount above; Docker
       # resolves the more specific path last, so it wins for that subtree
       # while the rest of /data stays read-write. See the admin-cli
       # profile below for account setup.
-      - ./data/zugang:/data/zugang:ro
+      - ${DATA_DIR:-./data}/zugang:/data/zugang:ro
     ports:
       - "127.0.0.1:8092:8000"
     security_opt:
@@ -125,6 +130,6 @@ services:
       CONTENT_DIR: /data
       SECRET_KEY: ${SECRET_KEY:?SECRET_KEY must be set — see .env.example}
     volumes:
-      - ./data:/data:rw
+      - ${DATA_DIR:-./data}:/data:rw
     security_opt:
       - no-new-privileges:true

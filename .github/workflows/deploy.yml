@@ -15,10 +15,10 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Code auschecken
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Python einrichten
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -37,7 +37,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Code auschecken
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Test-SECRET_KEY erzeugen
         run: echo "SECRET_KEY=$(python3 -c 'import secrets; print(secrets.token_hex(32))')" > .env
@@ -127,7 +127,7 @@ jobs:
       ENV_FILE: /etc/portfolio/.env
     steps:
       - name: Code auschecken
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Umgebung prüfen
         run: |

@@ -93,12 +93,19 @@ oben), keine echten Daten. `content/site.config.json` enthält bei Bedarf
 echte personenbezogene Angaben und ist deshalb in `.gitignore` eingetragen;
 Vorlage: `content/site.config.example.json`.
 
-In Docker Compose ist `./data` das eigentliche Laufzeitverzeichnis (entspricht
-`/var/lib/portfolio` in Produktion) — ein separates, git-ignoriertes
-Verzeichnis, weil es selbst ein Git-Repository ist (FA-41) und das nicht mit
-diesem Code-Repository verschachtelt sein darf. Beim ersten Start richtet der
-`init`-Dienst die Struktur ein und kopiert optional die Demo-Inhalte aus
-`./content`.
+In Docker Compose ist `DATA_DIR` (Umgebungsvariable, Standard `./data`) das
+eigentliche Laufzeitverzeichnis — git-ignoriert und ein eigenes Git-Repository
+(FA-41), darf also nicht mit diesem Code-Repository verschachtelt sein. Beim
+ersten Start richtet der `init`-Dienst die Struktur ein und kopiert optional
+die Demo-Inhalte aus `./content`.
+
+**Wichtig für jedes CI/deploy-gesteuerte Setup:** `DATA_DIR` muss außerhalb
+jedes Verzeichnisses liegen, das ein Checkout-Tool neu anlegen oder aufräumen
+könnte — die Container schreiben dort als uid 1000, und ein Cleanup-Schritt,
+der als anderer Host-Benutzer läuft (z. B. ein GitHub-Actions-Runner-Dienst-
+konto), kann diese Dateien dann nicht mehr entfernen. In `.env`
+`DATA_DIR=/var/lib/portfolio` setzen (Pfad laut Anforderungskatalog) — siehe
+`.env.example`.
 
 ## Tests
 
