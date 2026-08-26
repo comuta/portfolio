@@ -68,6 +68,53 @@ jobs:
           curl -sf http://127.0.0.1:8091/healthz
           curl -sf http://127.0.0.1:8092/healthz
 
+      - name: Admin-Testkonto anlegen
+        run: |
+          printf 'ci-test\nci-test-passwort-123\nci-test-passwort-123\n' | \
+            docker compose run --rm admin-cli create-user | tee create-user-output.txt
+          echo "TOTP_SECRET=$(grep -oE '[A-Z2-7]{32}' create-user-output.txt | head -1)" >> "$GITHUB_ENV"
+
+      - name: Einstellungen speichern (Regressionstest — site.config.json-Schreibzugriff)
+        # Genau dieser Ablauf brach einmal in Produktion: site.config.json
+        # liegt einzeln (nicht als Verzeichnis) gemountet, ihr Elternordner
+        # war dadurch nur ein leerer, root-eigener Platzhalter im Container
+        # statt eines echten Mounts — atomare Schreibvorgänge (storage.py)
+        # scheiterten daran mit einem 500er. /healthz allein hätte das nie
+        # gefunden, ein echter Speichervorgang über die Web-Oberfläche schon.
+        run: |
+          pip install --quiet pyotp
+          cookie_jar=$(mktemp)
+
+          login_html=$(curl -sS -c "$cookie_jar" http://127.0.0.1:8092/login)
+          csrf=$(echo "$login_html" | grep -o 'name="csrf_token" value="[^"]*"' | head -1 | sed 's/.*value="\(.*\)"/\1/')
+          code=$(python3 -c "import pyotp; print(pyotp.TOTP('$TOTP_SECRET').now())")
+
+          curl -sS -b "$cookie_jar" -c "$cookie_jar" -o /dev/null -X POST http://127.0.0.1:8092/login \
+            --data-urlencode "csrf_token=$csrf" \
+            --data-urlencode "benutzername=ci-test" \
+            --data-urlencode "passwort=ci-test-passwort-123" \
+            --data-urlencode "code=$code"
+
+          settings_html=$(curl -sS -b "$cookie_jar" -c "$cookie_jar" http://127.0.0.1:8092/einstellungen)
+          csrf2=$(echo "$settings_html" | grep -o 'name="csrf_token" value="[^"]*"' | head -1 | sed 's/.*value="\(.*\)"/\1/')
+
+          save_status=$(curl -sS -b "$cookie_jar" -c "$cookie_jar" -o /dev/null -w "%{http_code}" -X POST http://127.0.0.1:8092/einstellungen \
+            --data-urlencode "csrf_token=$csrf2" \
+            --data-urlencode "name=CI Test" \
+            --data-urlencode "kurzprofil=x" \
+            --data-urlencode "kontakt_email=ci@example.dev" \
+            --data-urlencode "impressum_name=CI Test" \
+            --data-urlencode "impressum_anschrift=Teststraße 1" \
+            --data-urlencode "impressum_email=ci@example.dev" \
+            --data-urlencode "impressum_bestaetigt=on")
+
+          echo "Status beim Speichern: $save_status"
+          if [ "$save_status" != "302" ]; then
+            echo "Einstellungen speichern ist fehlgeschlagen"
+            docker compose logs admin
+            exit 1
+          fi
+
       - name: Aufräumen
         if: always()
         run: docker compose down -v

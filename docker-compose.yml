@@ -9,12 +9,19 @@
 # admin turns it into its own git repo (FA-41), which would conflict with
 # it also being tracked by this repo.
 #
-# Mounts are directory-granular, never a single bare file: Docker silently
-# creates a missing bind-mount source as an empty *directory*, which would
-# corrupt a file mount. site.config.json (the one file living directly at
-# the content-dir root) is guaranteed to exist before web/admin start by
-# the `init` service, which runs admin/bootstrap.py's ensure_content_dir()
-# against the same ./data mount first.
+# web's mounts are directory-granular (FA-12: it must not even see privat/
+# or zugang/). admin/admin-cli mount the whole ./data tree at once instead,
+# with a narrower override for zugang/ — not split into one bind mount per
+# subdirectory. That per-subdirectory approach was tried first and broke
+# atomic writes to site.config.json: it lives directly at the content-dir
+# root, so its "sibling temp file, then rename" (storage.py) needs write
+# access to that root — but a root mounted only via its individual
+# children is just an empty, container-native, root-owned directory, not
+# a real mount, so both creating the temp file (permission denied) and
+# (even if that somehow worked) renaming across what are, from the
+# container's point of view, separate mounts (EXDEV) would fail. A single
+# broad mount avoids both problems and also removes the need to special-
+# case .git the way an earlier version of this file did.
 
 # Explicit name so container names (portfolio-web-1, portfolio-admin-1, ...)
 # are predictable regardless of the checkout directory name — otherwise
@@ -87,19 +94,13 @@ services:
       SEED_CONTENT_DIR: /seed-content
     volumes:
       - ./content:/seed-content:ro
-      # .git lives at the content-dir root, not inside one of the mounted
-      # subdirectories below, so it needs its own explicit mount — without
-      # it, /data itself is just a container-native root-owned directory
-      # (only its children are real host mounts) and git can't create or
-      # see .git there at all.
-      - ./data/.git:/data/.git:rw
-      - ./data/beitraege:/data/beitraege:rw
-      - ./data/seiten:/data/seiten:rw
-      - ./data/site.config.json:/data/site.config.json:rw
-      - ./data/.papierkorb:/data/.papierkorb:rw
+      - ./data:/data:rw
       # zugang/ (credentials) is read-only even here — the running admin
       # service never gets a code path that can touch the password/TOTP
-      # secret. See the admin-cli profile below for account setup.
+      # secret. Bind-mounted on top of the broad mount above; Docker
+      # resolves the more specific path last, so it wins for that subtree
+      # while the rest of /data stays read-write. See the admin-cli
+      # profile below for account setup.
       - ./data/zugang:/data/zugang:ro
     ports:
       - "127.0.0.1:8092:8000"
@@ -124,11 +125,6 @@ services:
       CONTENT_DIR: /data
       SECRET_KEY: ${SECRET_KEY:?SECRET_KEY must be set — see .env.example}
     volumes:
-      - ./data/.git:/data/.git:rw
-      - ./data/beitraege:/data/beitraege:rw
-      - ./data/seiten:/data/seiten:rw
-      - ./data/site.config.json:/data/site.config.json:rw
-      - ./data/.papierkorb:/data/.papierkorb:rw
-      - ./data/zugang:/data/zugang:rw
+      - ./data:/data:rw
     security_opt:
       - no-new-privileges:true
