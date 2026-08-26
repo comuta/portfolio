@@ -16,6 +16,12 @@
 # the `init` service, which runs admin/bootstrap.py's ensure_content_dir()
 # against the same ./data mount first.
 
+# Explicit name so container names (portfolio-web-1, portfolio-admin-1, ...)
+# are predictable regardless of the checkout directory name — otherwise
+# Compose derives the project name from the directory, which the CI
+# workflow's health-check step would then have to guess.
+name: portfolio
+
 services:
   init:
     build: .

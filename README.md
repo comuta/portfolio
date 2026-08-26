@@ -106,8 +106,25 @@ diesem Code-Repository verschachtelt sein darf. Beim ersten Start richtet der
 pytest
 ```
 
-50 Tests: `tests/` für `web` (Slug-Auflösung, Pfad-Traversal-Schutz,
-Markdown-Sanitisierung, Fehlerseiten, `/healthz`), `tests/admin/` für
+56 Tests: `tests/` für `web` (Slug-Auflösung, Pfad-Traversal-Schutz,
+Markdown-Sanitisierung, Fehlerseiten, Feed, `/healthz`), `tests/admin/` für
 `admin` (Anmeldung/TOTP/Wiederherstellungscode/Rate-Limit, CSRF,
 Medien-Upload-Validierung, CRUD-Lebenszyklus, strukturelle Trennung
-privat/öffentlich, CLI-Befehle).
+privat/öffentlich, CLI-Befehle, Einstellungsformular).
+
+## CI/CD
+
+`.github/workflows/deploy.yml`: bei jedem Push auf `main` (und manuell
+auslösbar) laufen zuerst `pytest` sowie ein echter Docker-Smoke-Test (bauen,
+hochfahren, auf `healthy` warten, `/healthz` beider Dienste abfragen — beide
+bisherigen echten Bugs in diesem Projekt zeigten sich nur beim tatsächlichen
+Containerstart, nie in reinen Python-Tests). Erst wenn beides grün ist, deployt
+ein self-hosted Runner auf dem Server per `docker compose up --build -d`,
+analog zur bestehenden Pipeline eines anderen Projekts auf demselben Server.
+
+**Vor dem ersten Lauf auf dem Server einzurichten** (nicht Teil dieses Repos):
+- `/etc/portfolio/.env` mit `SECRET_KEY=...` anlegen, lesbar für den
+  Runner-Nutzer (Pfad in `deploy.yml` anpassen, falls ein anderer gewünscht ist).
+- Ein self-hosted Runner muss für dieses Repository registriert sein.
+- Admin-Zugang bleibt weiterhin ein manueller, einmaliger Schritt auf dem
+  Server: `docker compose run --rm admin-cli flask --app wsgi_admin create-user`.

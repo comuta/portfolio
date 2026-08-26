@@ -1,0 +1,105 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Code auschecken
+        uses: actions/checkout@v4
+
+      - name: Python einrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Abhängigkeiten installieren
+        run: pip install -r requirements-dev.txt
+
+      - name: Tests ausführen
+        run: pytest
+
+  docker-smoke:
+    # Beide echten Bugs bisher in diesem Projekt (git-Ownership, fehlendes
+    # .git-Mount) zeigten sich erst beim tatsächlichen Containerstart, nie
+    # in den reinen Python-Tests — deshalb hier zusätzlich einmal wirklich
+    # bauen und hochfahren, nicht nur `docker compose config` validieren.
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Code auschecken
+        uses: actions/checkout@v4
+
+      - name: Test-SECRET_KEY erzeugen
+        run: echo "SECRET_KEY=$(python3 -c 'import secrets; print(secrets.token_hex(32))')" > .env
+
+      - name: Images bauen
+        run: docker compose build
+
+      - name: Stack starten
+        run: docker compose up -d
+
+      - name: Auf gesunde Container warten
+        run: |
+          for i in $(seq 1 30); do
+            web_status=$(docker inspect -f '{{.State.Health.Status}}' portfolio-web-1 2>/dev/null || echo "-")
+            admin_status=$(docker inspect -f '{{.State.Health.Status}}' portfolio-admin-1 2>/dev/null || echo "-")
+            if [ "$web_status" = "healthy" ] && [ "$admin_status" = "healthy" ]; then
+              echo "web und admin sind healthy"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Container wurden nicht rechtzeitig healthy"
+          docker compose logs
+          exit 1
+
+      - name: Endpunkte prüfen
+        run: |
+          curl -sf http://127.0.0.1:8081/healthz
+          curl -sf http://127.0.0.1:8082/healthz
+
+      - name: Aufräumen
+        if: always()
+        run: docker compose down -v
+
+  deploy:
+    runs-on: self-hosted
+    needs: [test, docker-smoke]
+    timeout-minutes: 15
+    env:
+      ENV_FILE: /etc/portfolio/.env
+    steps:
+      - name: Code auschecken
+        uses: actions/checkout@v4
+
+      - name: Umgebung prüfen
+        run: |
+          echo "Läuft auf: $(hostname)"
+          whoami
+          docker compose version
+
+      - name: .env prüfen
+        run: |
+          if [ ! -r "$ENV_FILE" ]; then
+            echo "Kann $ENV_FILE nicht lesen - liegt sie an der Stelle und darf der Runner-Nutzer sie lesen?"
+            exit 1
+          fi
+
+      - name: Container bauen und starten
+        run: docker compose --env-file "$ENV_FILE" up --build -d
+
+      - name: Alte Images aufräumen
+        run: docker image prune -f
+
+      - name: Status
+        run: docker compose --env-file "$ENV_FILE" ps
