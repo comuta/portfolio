@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 108" width="340" height="108" role="img" aria-labelledby="bannerTitel">
+  <title id="bannerTitel">wedel.dev</title>
+  <style>
+    .neutral { stroke: #12181C; }
+    .akzent  { stroke: #0B8A8F; }
+    .wort    { fill: #12181C; }
+    .endung  { fill: #0B8A8F; }
+    @media (prefers-color-scheme: dark) {
+      .neutral { stroke: #EDF1F3; }
+      .akzent  { stroke: #35C2C8; }
+      .wort    { fill: #EDF1F3; }
+      .endung  { fill: #35C2C8; }
+    }
+  </style>
+  <g fill="none" stroke-width="9" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4">
+    <path class="neutral" d="M12 54 L12 12 L40 84 L68 12 L68 54"/>
+    <path class="akzent"  d="M68 54 L68 96 L40 24 L12 96 L12 54"/>
+    <path class="neutral" d="M48.05 63.32 L55.29 44.68"/>
+  </g>
+  <text x="100" y="68" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="46" font-weight="500" letter-spacing="-0.5">
+    <tspan class="wort">wedel</tspan><tspan class="endung">.dev</tspan>
+  </text>
+</svg>

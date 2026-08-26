@@ -20,7 +20,7 @@
   --font-serif: 'Newsreader', Georgia, 'Times New Roman', serif;
   --font-mono: 'Roboto Mono', ui-monospace, 'SFMono-Regular', Consolas, monospace;
 
-  --content-width: 50rem;
+  --content-width: 64rem;
   color-scheme: light;
 }
 
@@ -112,10 +112,14 @@ img {
 }
 
 .site-header__name {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--color-text-strong);
+  display: inline-flex;
   text-decoration: none;
+}
+
+.site-header__name img {
+  height: 2.5rem;
+  width: auto;
+  display: block;
 }
 
 .site-nav {
@@ -214,6 +218,9 @@ img {
   font-size: 1.0625rem;
   line-height: 1.7;
   color: var(--color-text);
+  /* Independent of how wide the page itself is (--content-width) — long-form
+     text needs its own readable measure, not the full available width. */
+  max-width: 42rem;
 }
 
 .prose p {

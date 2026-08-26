@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 108" width="80" height="108" role="img" aria-labelledby="logoMonoTitel">
+  <title id="logoMonoTitel">wedel.dev</title>
+  <g fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4">
+    <path d="M12 54 L12 12 L24.17 43.28"/>
+    <path d="M32.5 64.72 L40 84 L68 12 L68 54"/>
+    <path d="M68 54 L68 96 L55.83 64.72"/>
+    <path d="M47.5 43.28 L40 24 L12 96 L12 54"/>
+  </g>
+</svg>

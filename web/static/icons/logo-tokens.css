@@ -1,0 +1,55 @@
+/* Farbsystem wedel.dev — Akzent Petrol
+   Einbinden vor dem restlichen Stylesheet. */
+
+:root {
+  color-scheme: light dark;
+
+  /* Logo. Wird von logo.svg über var(--logo-akzent) gelesen. */
+  --logo-akzent: #0B8A8F;
+
+  /* Links und Bedienelemente. Dunkler als der Logo-Ton,
+     damit Fließtext auf Weiss ausreichend Kontrast hat. */
+  --akzent: #076E72;
+  --akzent-hover: #05585B;
+  --akzent-flaeche: #E4F2F2;
+  --akzent-rand: #9FD1D3;
+
+  --text: #12181C;
+  --text-leise: #5A666E;
+  --grund: #FFFFFF;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --logo-akzent: #35C2C8;
+
+    --akzent: #47CDD3;
+    --akzent-hover: #6FDCE1;
+    --akzent-flaeche: #0E2A2C;
+    --akzent-rand: #1E4A4D;
+
+    --text: #EDF1F3;
+    --text-leise: #9AA7AE;
+    --grund: #0D1417;
+  }
+}
+
+/* Das Logo erbt die Textfarbe für den M-Teil.
+   Nur nötig, wenn logo.svg inline im HTML steht. */
+.logo {
+  color: var(--text);
+  display: block;
+}
+
+a {
+  color: var(--akzent);
+}
+
+a:hover {
+  color: var(--akzent-hover);
+}
+
+a:focus-visible {
+  outline: 2px solid var(--akzent);
+  outline-offset: 2px;
+}

@@ -135,3 +135,12 @@ analog zur bestehenden Pipeline eines anderen Projekts auf demselben Server.
 - Ein self-hosted Runner muss für dieses Repository registriert sein.
 - Admin-Zugang bleibt weiterhin ein manueller, einmaliger Schritt auf dem
   Server: `docker compose run --rm admin-cli flask --app wsgi_admin create-user`.
+
+## Lizenzhinweis zu einzelnen Assets
+
+Die Icons unter `web/static/icons/` (und ggf. `admin/static/icons/`) sind
+**nur für den persönlichen Gebrauch auf dieser Website lizenziert** — anders
+als der übrige Code hier sind sie **nicht** zur Weiterverwendung oder
+Weitergabe freigegeben. Wichtig, falls dieses Repository (oder Teile davon)
+irgendwann als Vorlage/Open-Source-Grundgerüst weitergegeben werden: diese
+Dateien vorher entfernen bzw. durch frei lizenzierte Icons ersetzen.

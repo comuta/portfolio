@@ -15,3 +15,5 @@ content/site.config.json
 # Docker Compose runtime content directory (mirrors /var/lib/portfolio).
 # It's its own git repo (FA-41) managed by the admin app, not this repo.
 /data/
+
+anforderungskatalog-portfolio.md

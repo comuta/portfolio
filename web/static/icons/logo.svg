@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 108" width="80" height="108" role="img" aria-labelledby="logoTitel">
+  <title id="logoTitel">wedel.dev</title>
+  <g fill="none" stroke-width="9" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4">
+    <path d="M12 54 L12 12 L40 84 L68 12 L68 54" stroke="currentColor"/>
+    <path d="M68 54 L68 96 L40 24 L12 96 L12 54" stroke="var(--logo-akzent, #0B8A8F)"/>
+    <path d="M48.05 63.32 L55.29 44.68" stroke="currentColor"/>
+  </g>
+</svg>
