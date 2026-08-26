@@ -65,8 +65,8 @@ jobs:
 
       - name: Endpunkte prüfen
         run: |
-          curl -sf http://127.0.0.1:8081/healthz
-          curl -sf http://127.0.0.1:8082/healthz
+          curl -sf http://127.0.0.1:8091/healthz
+          curl -sf http://127.0.0.1:8092/healthz
 
       - name: Aufräumen
         if: always()

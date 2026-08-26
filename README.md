@@ -23,8 +23,8 @@ cp .env.example .env
 docker compose up -d
 ```
 
-Das startet `web` (`http://127.0.0.1:8081`) und `admin`
-(`http://127.0.0.1:8082`) mit Demo-Inhalten aus `./content`. Die eigentlichen
+Das startet `web` (`http://127.0.0.1:8091`) und `admin`
+(`http://127.0.0.1:8092`) mit Demo-Inhalten aus `./content`. Die eigentlichen
 Laufzeitdaten liegen in `./data` (git-ignoriert, eigenes Git-Repository —
 siehe unten).
 
