@@ -13,6 +13,16 @@ bp = Blueprint("auth", __name__)
 _hasher = PasswordHasher()
 
 
+def _is_recovery_code(konto: users.Benutzer, code: str) -> bool:
+    if not konto.recovery_code_hash or not code:
+        return False
+    try:
+        _hasher.verify(konto.recovery_code_hash, code)
+        return True
+    except VerifyMismatchError:
+        return False
+
+
 def login_required(view):
     @wraps(view)
     def wrapped(*args, **kwargs):
@@ -48,8 +58,8 @@ def login():
                 _hasher.verify(konto.passwort_hash, passwort)
             except VerifyMismatchError:
                 gueltig = False
-        if gueltig and not pyotp.TOTP(konto.totp_secret).verify(code, valid_window=1):
-            gueltig = False
+        if gueltig:
+            gueltig = pyotp.TOTP(konto.totp_secret).verify(code, valid_window=1) or _is_recovery_code(konto, code)
 
         if not gueltig:
             flash("Anmeldung fehlgeschlagen.", "error")

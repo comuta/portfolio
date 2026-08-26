@@ -39,6 +39,20 @@ Dieser Befehl läuft bewusst über ein eigenes `admin-cli`-Profil und nicht
 nur Lesezugriff (siehe FA-26-Tabelle) — kein über HTTP erreichbarer Code
 kann die Zugangsdaten verändern.
 
+`create-user` erzeugt neben Passwort und TOTP-Secret auch einen
+**Wiederherstellungscode** (für den Login-Screen, falls das TOTP-Gerät
+verloren geht — dort funktioniert er anstelle des 6-stelligen Codes).
+Anders als klassische Backup-Codes ist er **nicht einmalig verwendbar**:
+Aus demselben Grund (`zugang/` nur lesend im laufenden Dienst) kann der
+Login ihn nicht als "verbraucht" markieren. Er bleibt gültig, bis er
+manuell rotiert wird — am besten direkt nach jeder Verwendung:
+
+```bash
+docker compose run --rm admin-cli flask --app wsgi_admin rotate-recovery-code
+```
+
+Ändert nur den Wiederherstellungscode, lässt Passwort und TOTP unangetastet.
+
 ## Lokale Entwicklung ohne Docker
 
 ```bash
@@ -92,7 +106,8 @@ diesem Code-Repository verschachtelt sein darf. Beim ersten Start richtet der
 pytest
 ```
 
-38 Tests: `tests/` für `web` (Slug-Auflösung, Pfad-Traversal-Schutz,
-Markdown-Sanitisierung, Fehlerseiten), `tests/admin/` für `admin`
-(Anmeldung/TOTP/Rate-Limit, CSRF, Medien-Upload-Validierung,
-CRUD-Lebenszyklus, strukturelle Trennung privat/öffentlich).
+50 Tests: `tests/` für `web` (Slug-Auflösung, Pfad-Traversal-Schutz,
+Markdown-Sanitisierung, Fehlerseiten, `/healthz`), `tests/admin/` für
+`admin` (Anmeldung/TOTP/Wiederherstellungscode/Rate-Limit, CSRF,
+Medien-Upload-Validierung, CRUD-Lebenszyklus, strukturelle Trennung
+privat/öffentlich, CLI-Befehle).

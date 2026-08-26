@@ -9,6 +9,7 @@ from admin import create_app, limiter, users
 
 PASSWORD = "correct horse battery staple"
 USERNAME = "ada"
+RECOVERY_CODE = "abcde-fghij-klmno-pqrst"
 
 
 @pytest.fixture
@@ -55,6 +56,7 @@ def account(app, content_dir, totp_secret):
             benutzername=USERNAME,
             passwort_hash=PasswordHasher().hash(PASSWORD),
             totp_secret=totp_secret,
+            recovery_code_hash=PasswordHasher().hash(RECOVERY_CODE),
             erstellt_am=datetime.now(timezone.utc),
         )
         users.save_user(str(content_dir), konto)

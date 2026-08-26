@@ -23,6 +23,11 @@ class Benutzer(BaseModel):
     passwort_hash: str
     totp_secret: str
     erstellt_am: datetime
+    # Static, not single-use: the running admin service only has read access
+    # to zugang/ (FA-26), so login can't mark a code "consumed" by writing
+    # here. Rotate it via `flask rotate-recovery-code` (ideally right after
+    # using it) instead of relying on one-time consumption.
+    recovery_code_hash: str | None = None
 
 
 def _path(content_dir: str) -> Path:
