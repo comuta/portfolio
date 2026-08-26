@@ -139,8 +139,13 @@ def about():
 
 @public.route("/impressum")
 def imprint():
+    # The structured impressum fields in site.config.json (edited under
+    # /einstellungen, gated behind an explicit confirmation — FA-23) are the
+    # actual legally-required content; seiten/impressum.md is free-text
+    # supplementary material only (e.g. a note on content responsibility
+    # phrasing), not a replacement for it.
     body_html = content.load_page(_content_dir(), "impressum")
-    return render_template("legal_page.html", title="Impressum", body_html=body_html)
+    return render_template("impressum.html", body_html=body_html)
 
 
 @public.route("/datenschutz")

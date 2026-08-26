@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Impressum — {{ super() }}{% endblock %}
+
+{% block content %}
+  <h1>Impressum</h1>
+  <div class="prose">
+    {% if site_config %}
+      <h2>Angaben gemäß § 5 DDG</h2>
+      <p>
+        {{ site_config.impressum.name }}<br>
+        {{ site_config.impressum.anschrift }}
+      </p>
+
+      <h2>Kontakt</h2>
+      <p>
+        E-Mail: <a href="mailto:{{ site_config.impressum.email }}">{{ site_config.impressum.email }}</a>
+        {% if site_config.impressum.telefon %}<br>Telefon: {{ site_config.impressum.telefon }}{% endif %}
+      </p>
+
+      {% if site_config.impressum.ust_id %}
+        <h2>Umsatzsteuer-ID</h2>
+        <p>{{ site_config.impressum.ust_id }}</p>
+      {% endif %}
+
+      <h2>Verantwortlich für den Inhalt</h2>
+      <p>{{ site_config.impressum.name }}, Anschrift wie oben</p>
+    {% else %}
+      <p>Noch keine Angaben in den Einstellungen hinterlegt.</p>
+    {% endif %}
+
+    {% if body_html %}
+      {{ body_html | safe }}
+    {% endif %}
+  </div>
+{% endblock %}

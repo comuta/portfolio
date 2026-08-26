@@ -5,6 +5,15 @@
 {% block content %}
   <h1>{{ title }} bearbeiten</h1>
 
+  {% if name == "impressum" %}
+    <p class="eyebrow">
+      Name, Anschrift, E-Mail, Telefon und USt-IdNr. kommen von der
+      <a href="/einstellungen">Einstellungen</a>-Seite — hier nur
+      ergänzender Freitext (z. B. Hinweise zur Streitbeilegung), der unter
+      "Verantwortlich für den Inhalt" angehängt wird.
+    </p>
+  {% endif %}
+
   {% if name == "ueber-mich" %}
     <fieldset>
       <legend>Porträt</legend>

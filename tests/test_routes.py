@@ -1,6 +1,18 @@
 from tests.conftest import write_post
 
 
+def test_impressum_renders_structured_fields_from_site_config(client):
+    # Regression test: /impressum used to only render seiten/impressum.md,
+    # completely ignoring the structured impressum fields in site.config.json
+    # that the admin's /einstellungen page collects (and gates behind an
+    # extra confirmation checkbox specifically because they're supposed to
+    # be the legally-authoritative content).
+    body = client.get("/impressum").get_data(as_text=True)
+    assert "Test Name" in body
+    assert "Teststraße 1" in body
+    assert "test@example.dev" in body
+
+
 def test_unknown_project_slug_returns_custom_404(client):
     resp = client.get("/projekte/does-not-exist/")
     assert resp.status_code == 404
