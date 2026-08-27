@@ -82,13 +82,6 @@
 
     <article class="prose detail-body">
       {{ post.content_html | safe }}
-
-      <div class="detail-footer">
-        <a href="/projekte">← /projekte</a>
-        {% if next_post %}
-          <a href="/projekte/{{ next_post.slug }}/">nächster beitrag: {{ next_post.titel }} →</a>
-        {% endif %}
-      </div>
     </article>
   </div>
 
@@ -127,4 +120,11 @@
       {% endfor %}
     </section>
   {% endif %}
+
+  <div class="detail-footer">
+    <a href="/projekte">← /projekte</a>
+    {% if next_post %}
+      <a href="/projekte/{{ next_post.slug }}/">nächster beitrag: {{ next_post.titel }} →</a>
+    {% endif %}
+  </div>
 {% endblock %}
