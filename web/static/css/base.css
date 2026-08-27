@@ -116,10 +116,29 @@ img {
   text-decoration: none;
 }
 
-.site-header__name img {
+.site-banner {
   height: 2.5rem;
   width: auto;
   display: block;
+}
+
+/* Inline SVG (not <img>) so it follows --color-* like the rest of the page —
+   an externally referenced SVG's own @media (prefers-color-scheme) isn't
+   reliably evaluated by every mobile browser in <img> context. */
+.site-banner__stroke-neutral {
+  stroke: var(--color-text-strong);
+}
+
+.site-banner__stroke-accent {
+  stroke: var(--color-accent);
+}
+
+.site-banner__fill-neutral {
+  fill: var(--color-text-strong);
+}
+
+.site-banner__fill-accent {
+  fill: var(--color-accent);
 }
 
 .site-nav {
