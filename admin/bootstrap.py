@@ -24,14 +24,18 @@ _SKELETON = (
 def ensure_content_dir(content_dir: str, seed_from: str | None = None) -> None:
     base = Path(content_dir)
     is_new = not base.exists() or not any(base.iterdir())
+    seed_path = Path(seed_from) if seed_from else None
+
+    # Seed onto the still-pristine directory *before* the skeleton loop below
+    # creates beitraege/oeffentlich, beitraege/privat and seiten as empty
+    # dirs — _seed()'s per-top-level-item `target.exists()` check would
+    # otherwise see those as "already there" and skip copying the demo
+    # content into them entirely.
+    if is_new and seed_path:
+        _seed(base, seed_path)
 
     for rel in _SKELETON:
         (base / rel).mkdir(parents=True, exist_ok=True)
-
-    seed_path = Path(seed_from) if seed_from else None
-
-    if is_new and seed_path:
-        _seed(base, seed_path)
 
     # site.config.json lives alone at the content-dir root (not inside one of
     # the _SKELETON directories), and Docker Compose bind-mounts it as a single
