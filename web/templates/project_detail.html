@@ -25,18 +25,7 @@
     </figure>
   {% endif %}
 
-  <div class="two-col">
-    <article class="prose">
-      {{ post.content_html | safe }}
-
-      <div class="detail-footer">
-        <a href="/projekte">← /projekte</a>
-        {% if next_post %}
-          <a href="/projekte/{{ next_post.slug }}/">nächster beitrag: {{ next_post.titel }} →</a>
-        {% endif %}
-      </div>
-    </article>
-
+  <div class="detail-layout">
     <aside class="meta-box" aria-label="Beitragsdaten">
       <div class="meta-box__section meta-box__section--header">meta.json</div>
       <dl class="meta-box__list">
@@ -90,6 +79,17 @@
         </div>
       {% endif %}
     </aside>
+
+    <article class="prose detail-body">
+      {{ post.content_html | safe }}
+
+      <div class="detail-footer">
+        <a href="/projekte">← /projekte</a>
+        {% if next_post %}
+          <a href="/projekte/{{ next_post.slug }}/">nächster beitrag: {{ next_post.titel }} →</a>
+        {% endif %}
+      </div>
+    </article>
   </div>
 
   {% if post.galerie_dateinamen %}

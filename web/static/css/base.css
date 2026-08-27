@@ -510,7 +510,10 @@ img {
 .detail-head__lead {
   margin: 0.25rem 0 0;
   font-size: 1.0625rem;
-  max-width: 60ch;
+  /* Overrides .prose's 42rem reading-measure cap: above the titelbild there's
+     no sidebar to wrap around, so title and lead should span the same full
+     width as the image below them instead of looking narrower in comparison. */
+  max-width: none;
 }
 
 .titelbild {
@@ -545,10 +548,43 @@ img {
   font-size: 0.8125rem;
 }
 
+/* meta-box floats rather than sitting in a grid column: a grid track stays
+   the full row height even once the (usually much shorter) box has ended,
+   so the article text could never reclaim that width below it. Floating it
+   — and putting it first in the markup, since a float only affects in-flow
+   content that follows it — lets the article wrap around the box and then
+   run full width again past it, with the same gap on both sides. */
 .meta-box {
+  float: right;
+  width: 15rem;
+  /* Bottom gap matches the side gap (2.25rem, ex-grid gap) on purpose — the
+     text below should meet the box with the same spacing it has beside it. */
+  margin: 0 0 2.25rem 2.25rem;
   border: 1px solid var(--color-border);
   font-size: 0.8125rem;
-  align-self: start;
+}
+
+.detail-layout::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+/* Overrides .prose's 42rem reading-measure cap: the meta-box float already
+   narrows the wrapped lines near the top on its own, so a fixed max-width on
+   top of that would stop the text from ever reaching full width again once
+   past the box — which is the whole point of floating it instead of using a
+   grid column. */
+.detail-body {
+  max-width: none;
+}
+
+@media (max-width: 45rem) {
+  .meta-box {
+    float: none;
+    width: auto;
+    margin: 0 0 1.5rem;
+  }
 }
 
 .meta-box__section {
