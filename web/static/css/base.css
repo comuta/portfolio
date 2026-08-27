@@ -263,6 +263,35 @@ img {
   color: var(--color-text-strong);
 }
 
+/* Unstyled <code>/<pre> otherwise fall back to the browser's default
+   monospace stack at 1em — visually inconsistent with the rest of the
+   page, which always sets font-mono explicitly. 0.8125rem matches every
+   other mono-family element on the site (nav, tables, buttons). */
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  background: var(--color-row-alt);
+  border: 1px solid var(--color-border-subtle);
+  padding: 0.15em 0.35em;
+}
+
+.prose pre {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  background: var(--color-row-alt);
+  border: 1px solid var(--color-border-subtle);
+  padding: 0.9rem 1rem;
+  margin: 1.25rem 0;
+  overflow-x: auto;
+}
+
+.prose pre code {
+  background: none;
+  border: none;
+  padding: 0;
+}
+
 .two-col {
   display: grid;
   grid-template-columns: 1fr 15rem;
