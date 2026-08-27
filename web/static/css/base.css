@@ -215,6 +215,17 @@ img {
     flex-direction: column;
     align-items: flex-start;
   }
+
+  /* Below this width, forced nowrap made the "titel" cell push the table
+     wider than the screen, so the homepage's "letzte einträge" table
+     needed horizontal scrolling just to be read at all. Titles wrap
+     instead; datum/typ are short single tokens so wrapping them is a
+     no-op. */
+  .entry-table th,
+  .entry-table td {
+    white-space: normal;
+    padding: 0.5rem 0.4rem;
+  }
 }
 
 .site-main > h1 {
@@ -261,6 +272,7 @@ img {
 @media (max-width: 45rem) {
   .two-col {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 }
 
