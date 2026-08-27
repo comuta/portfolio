@@ -20,6 +20,18 @@
         <div data-upload-status></div>
       </form>
     </fieldset>
+
+    <fieldset>
+      <legend>Bilderstrecke hochladen</legend>
+      <form method="post" data-galerie-upload-form action="/beitraege/{{ dir_name }}/medien/hochladen" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label>Bilddateien (png, jpg, webp, gif) — Mehrfachauswahl möglich
+          <input type="file" name="datei" accept="image/png,image/jpeg,image/webp,image/gif" multiple required>
+        </label>
+        <button type="submit" class="button">Hochladen und zur Bilderstrecke hinzufügen</button>
+        <div data-galerie-upload-status></div>
+      </form>
+    </fieldset>
   {% else %}
     <p class="eyebrow">Medien-Upload steht nach dem ersten Speichern zur Verfügung.</p>
   {% endif %}

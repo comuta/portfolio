@@ -112,6 +112,49 @@ function setupMediaUpload() {
 
 document.addEventListener("DOMContentLoaded", setupMediaUpload);
 
+function setupGalerieUpload() {
+  const form = document.querySelector("[data-galerie-upload-form]");
+  if (!form) return;
+
+  const fileInput = form.querySelector('input[type="file"]');
+  const status = document.querySelector("[data-galerie-upload-status]");
+  const galerieInput = document.querySelector('input[name="galerie"]');
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    if (!fileInput.files.length) return;
+
+    const body = new FormData();
+    body.append("csrf_token", form.querySelector('input[name="csrf_token"]').value);
+    Array.from(fileInput.files).forEach((datei) => body.append("datei", datei));
+
+    status.textContent = "Lädt hoch …";
+    fetch(form.action, { method: "POST", body })
+      .then((resp) => resp.json().then((data) => ({ ok: resp.ok, data })))
+      .then(({ ok, data }) => {
+        if (!ok) {
+          status.textContent = "Fehler: " + (data.error || "Upload fehlgeschlagen.");
+          return;
+        }
+
+        const pfade = data.pfade || [];
+        if (galerieInput) {
+          const vorhanden = galerieInput.value.trim();
+          const neu = [vorhanden, ...pfade].filter(Boolean).join(", ");
+          galerieInput.value = neu;
+        }
+
+        status.textContent = `${pfade.length} Bild(er) hochgeladen und zur Bilderstrecke hinzugefügt.`;
+        fileInput.value = "";
+      })
+      .catch(() => {
+        status.textContent = "Fehler beim Hochladen.";
+      });
+  });
+}
+
+document.addEventListener("DOMContentLoaded", setupGalerieUpload);
+
 function setupAliasRows() {
   const addButton = document.querySelector("[data-add-alias-row]");
   const container = document.querySelector("[data-alias-rows]");

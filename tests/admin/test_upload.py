@@ -47,6 +47,22 @@ def test_valid_image_is_accepted_with_server_generated_name(logged_in_client, co
     assert (content_dir / "beitraege" / "privat" / dir_name / pfad).is_file()
 
 
+def test_multiple_images_are_accepted_in_one_request(logged_in_client, content_dir):
+    dir_name = _new_post(logged_in_client)
+    resp = logged_in_client.post(
+        f"/beitraege/{dir_name}/medien/hochladen",
+        data={"datei": [(_png_bytes(), "eins.png"), (_png_bytes(), "zwei.png")]},
+        content_type="multipart/form-data",
+    )
+    assert resp.status_code == 200
+    pfade = resp.get_json()["pfade"]
+    assert len(pfade) == 2
+    for pfad in pfade:
+        assert pfad.startswith("medien/")
+        assert (content_dir / "beitraege" / "privat" / dir_name / pfad).is_file()
+    assert len({p for p in pfade}) == 2
+
+
 def test_non_image_content_is_rejected_despite_image_filename(logged_in_client):
     dir_name = _new_post(logged_in_client)
     resp = logged_in_client.post(

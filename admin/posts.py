@@ -139,17 +139,21 @@ def upload_media(dir_name):
         abort(404)
     path, _visibility = found
 
-    file_storage = request.files.get("datei")
-    if file_storage is None:
+    dateien = request.files.getlist("datei")
+    if not dateien:
         return {"error": "Keine Datei übermittelt."}, 400
 
+    pfade = []
     try:
-        filename = media.save_validated_image(file_storage, path / "medien")
+        for file_storage in dateien:
+            filename = media.save_validated_image(file_storage, path / "medien")
+            pfade.append(f"medien/{filename}")
     except media.UploadError as exc:
         return {"error": str(exc)}, 400
 
-    versioning.commit_all(Path(content_dir), f"Medium hochgeladen: {dir_name}/medien/{filename}")
-    return {"pfad": f"medien/{filename}"}
+    label = pfade[0] if len(pfade) == 1 else f"{len(pfade)} Dateien"
+    versioning.commit_all(Path(content_dir), f"Medium hochgeladen: {dir_name}/medien ({label})")
+    return {"pfade": pfade, "pfad": pfade[0]}
 
 
 @bp.route("/vorschau", methods=["POST"])
