@@ -59,6 +59,10 @@ body {
   font-family: var(--font-mono);
   font-size: 15px;
   line-height: 1.5;
+  /* Safety net: whatever the exact cause, the page itself must never pan
+     sideways — at worst something clips instead of dragging the whole
+     layout along with it. */
+  overflow-x: hidden;
 }
 
 a {
@@ -296,6 +300,15 @@ img {
   display: grid;
   grid-template-columns: 1fr 15rem;
   gap: 2.25rem;
+}
+
+/* Grid items default to min-width: auto, i.e. they refuse to shrink below
+   their content's own min-content size. The entry-table inside (even
+   wrapped in .table-scroll) has a wide min-content size on its own, so
+   without this the whole column — and with it the whole page — grew wider
+   than the viewport on mobile instead of just scrolling the table locally. */
+.two-col > * {
+  min-width: 0;
 }
 
 @media (max-width: 45rem) {
