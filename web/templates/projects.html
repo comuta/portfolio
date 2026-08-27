@@ -8,21 +8,30 @@
     <span class="eyebrow">{{ total_count }} einträge · sortiert nach datum</span>
   </div>
 
-  <ul class="chip-list" aria-label="Nach Stack oder Thema filtern">
-    <li>
-      <a class="chip{% if active_label == 'alle' %} chip--active{% endif %}" href="/projekte">alle</a>
-    </li>
-    {% for s in stacks %}
-      <li>
-        <a class="chip{% if active_label == 'stack:' ~ s %} chip--active{% endif %}" href="{{ url_for('public.projects_by_stack', stack_name=s) }}">stack:{{ s }}</a>
-      </li>
-    {% endfor %}
-    {% for t in themen %}
-      <li>
-        <a class="chip{% if active_label == 'thema:' ~ t %} chip--active{% endif %}" href="{{ url_for('public.projects_by_thema', thema=t) }}">thema:{{ t }}</a>
-      </li>
-    {% endfor %}
-  </ul>
+  <form class="filter-bar" method="get" action="/projekte" aria-label="Nach Stack oder Thema filtern">
+    <div class="filter-field">
+      <label for="filter-stack">stack</label>
+      <select id="filter-stack" name="stack">
+        <option value=""{% if not active_stack %} selected{% endif %}>alle</option>
+        {% for s in stacks %}
+          <option value="{{ s }}"{% if s == active_stack %} selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-field">
+      <label for="filter-thema">thema</label>
+      <select id="filter-thema" name="thema">
+        <option value=""{% if not active_thema %} selected{% endif %}>alle</option>
+        {% for t in themen %}
+          <option value="{{ t }}"{% if t == active_thema %} selected{% endif %}>{{ t }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="button button--primary">filtern</button>
+    {% if active_stack or active_thema %}
+      <a class="button" href="/projekte">zurücksetzen</a>
+    {% endif %}
+  </form>
 
   <div class="table-scroll">
     <table class="entry-table">
@@ -57,12 +66,12 @@
       <span>seite {{ page }} von {{ total_pages }}</span>
       <span class="pagination__links">
         {% if page > 1 %}
-          <a class="button" href="?seite={{ page - 1 }}">← zurück</a>
+          <a class="button" href="{{ url_for('public.projects', seite=page - 1, stack=active_stack, thema=active_thema) }}">← zurück</a>
         {% else %}
           <span class="button button--disabled">← zurück</span>
         {% endif %}
         {% if page < total_pages %}
-          <a class="button button--primary" href="?seite={{ page + 1 }}">weiter →</a>
+          <a class="button button--primary" href="{{ url_for('public.projects', seite=page + 1, stack=active_stack, thema=active_thema) }}">weiter →</a>
         {% else %}
           <span class="button button--disabled">weiter →</span>
         {% endif %}

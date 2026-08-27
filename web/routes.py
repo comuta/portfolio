@@ -1,7 +1,7 @@
 import math
 from pathlib import Path
 
-from flask import Blueprint, Response, abort, current_app, render_template, request, send_from_directory
+from flask import Blueprint, Response, abort, current_app, redirect, render_template, request, send_from_directory, url_for
 
 from shared import content
 
@@ -32,7 +32,7 @@ def _current_page() -> int:
         return 1
 
 
-def _render_project_listing(all_projects, filtered_projects, active_label):
+def _render_project_listing(all_projects, filtered_projects, active_stack, active_thema):
     themen = sorted({t for p in all_projects for t in p.themen})
     stacks = sorted({s for p in all_projects for s in p.stack})
 
@@ -47,7 +47,8 @@ def _render_project_listing(all_projects, filtered_projects, active_label):
         total_count=len(filtered_projects),
         themen=themen,
         stacks=stacks,
-        active_label=active_label,
+        active_stack=active_stack,
+        active_thema=active_thema,
         page=page,
         total_pages=total_pages,
     )
@@ -86,21 +87,29 @@ def index():
 @public.route("/projekte")
 def projects():
     all_projects = content.list_projects(_content_dir())
-    return _render_project_listing(all_projects, all_projects, "alle")
+    active_stack = request.args.get("stack") or None
+    active_thema = request.args.get("thema") or None
+
+    filtered = all_projects
+    if active_stack:
+        filtered = [p for p in filtered if active_stack in p.stack]
+    if active_thema:
+        filtered = [p for p in filtered if active_thema in p.themen]
+
+    return _render_project_listing(all_projects, filtered, active_stack, active_thema)
 
 
+# Alte pfadbasierte Filter-URLs (vor den Dropdown-Filtern) — als Redirect
+# erhalten, falls irgendwo verlinkt oder ein Suchmaschinen-Crawler den
+# alten Pfad noch kennt.
 @public.route("/projekte/thema/<thema>")
 def projects_by_thema(thema):
-    all_projects = content.list_projects(_content_dir())
-    filtered = [p for p in all_projects if thema in p.themen]
-    return _render_project_listing(all_projects, filtered, f"thema:{thema}")
+    return redirect(url_for("public.projects", thema=thema))
 
 
 @public.route("/projekte/stack/<stack_name>")
 def projects_by_stack(stack_name):
-    all_projects = content.list_projects(_content_dir())
-    filtered = [p for p in all_projects if stack_name in p.stack]
-    return _render_project_listing(all_projects, filtered, f"stack:{stack_name}")
+    return redirect(url_for("public.projects", stack=stack_name))
 
 
 def _get_post_or_404(slug: str) -> content.Post:
