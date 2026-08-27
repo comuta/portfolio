@@ -14,7 +14,7 @@ def test_create_user_generates_a_working_recovery_code(app, content_dir):
     result = _create_via_cli(app)
     assert "Wiederherstellungscode:" in result.output
 
-    line = next(l for l in result.output.splitlines() if l.startswith("Wiederherstellungscode:"))
+    line = next(zeile for zeile in result.output.splitlines() if zeile.startswith("Wiederherstellungscode:"))
     code = line.split(":", 1)[1].strip()
 
     konto = users.load_user(str(content_dir))
@@ -39,7 +39,7 @@ def test_rotate_recovery_code_changes_only_the_recovery_code(app, content_dir):
 
 def test_rotate_recovery_code_invalidates_the_old_code(app, content_dir):
     result = _create_via_cli(app)
-    old_line = next(l for l in result.output.splitlines() if l.startswith("Wiederherstellungscode:"))
+    old_line = next(zeile for zeile in result.output.splitlines() if zeile.startswith("Wiederherstellungscode:"))
     old_code = old_line.split(":", 1)[1].strip()
 
     runner = app.test_cli_runner()

@@ -1,0 +1,19 @@
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+
+[tool.ruff.lint]
+# Pyflakes (F) + pycodestyle errors (E) + import sorting (I) — the
+# uncontroversial baseline FA-40 asks for. Deliberately not pulling in the
+# stricter opinionated plugin sets (bugbear, pylint-equivalents, datetime-tz,
+# ...): those would each need a project-wide policy decision first, which is
+# a separate piece of work from "add a lint gate to the pipeline".
+select = ["E", "F", "I"]
+
+[tool.mypy]
+python_version = "3.12"
+files = ["admin", "shared", "web", "wsgi_admin.py", "wsgi_web.py"]
+# Third-party libs here (flask_limiter, flask_talisman, bleach, markdown,
+# pyotp, argon2) ship no type stubs and aren't worth vendoring/writing stubs
+# for just to satisfy the checker.
+ignore_missing_imports = true

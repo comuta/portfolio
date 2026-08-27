@@ -44,7 +44,7 @@ def create_app(content_dir: str | None = None) -> Flask:
     # client_max_body_size above this.
     app.config["MAX_CONTENT_LENGTH"] = 40 * 1024 * 1024
 
-    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)  # type: ignore[method-assign]
 
     Talisman(
         app,

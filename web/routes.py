@@ -1,7 +1,17 @@
 import math
 from pathlib import Path
 
-from flask import Blueprint, Response, abort, current_app, redirect, render_template, request, send_from_directory, url_for
+from flask import (
+    Blueprint,
+    Response,
+    abort,
+    current_app,
+    redirect,
+    render_template,
+    request,
+    send_from_directory,
+    url_for,
+)
 
 from shared import content
 

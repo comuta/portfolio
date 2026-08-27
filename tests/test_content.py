@@ -1,4 +1,3 @@
-import json
 
 from shared import content
 from tests.conftest import write_post

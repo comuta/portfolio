@@ -60,7 +60,9 @@ def edit_page(name):
 
     text = path.read_text(encoding="utf-8") if path.is_file() else ""
     portrait_ext = _find_portrait_ext(content_dir) if name == "ueber-mich" else None
-    return render_template("page_form.html", name=name, title=_PAGE_TITLES[name], inhalt=text, portrait_ext=portrait_ext)
+    return render_template(
+        "page_form.html", name=name, title=_PAGE_TITLES[name], inhalt=text, portrait_ext=portrait_ext
+    )
 
 
 @bp.route("/seiten/portrait/hochladen", methods=["POST"])
@@ -167,7 +169,7 @@ def _parse_settings_form(form) -> dict:
 
 
 def _config_to_form_values(config: content.SiteConfig) -> dict:
-    values = {
+    values: dict[str, object] = {
         "name": config.name,
         "kurzprofil": config.kurzprofil,
         "hinweis": config.hinweis or "",

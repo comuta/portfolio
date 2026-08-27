@@ -25,6 +25,12 @@ jobs:
       - name: Abhängigkeiten installieren
         run: pip install -r requirements-dev.txt
 
+      - name: Linting (ruff)
+        run: ruff check .
+
+      - name: Typprüfung (mypy)
+        run: mypy .
+
       - name: Tests ausführen
         run: pytest
 
@@ -67,6 +73,44 @@ jobs:
         run: |
           curl -sf http://127.0.0.1:8091/healthz
           curl -sf http://127.0.0.1:8092/healthz
+
+      - name: Node.js einrichten (für Lighthouse)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Lighthouse / Barrierefreiheit prüfen (FA-40, NFR-01)
+        # Läuft gegen die öffentliche Seite mit dem Demo-Content aus ./content
+        # (siehe init-Service oben). Performance bekommt etwas Spielraum
+        # unter dem NFR-01-Zielwert, weil geteilte CI-Runner-Hardware
+        # rauschiger misst als eine lokale Maschine — Accessibility/
+        # Best-Practices/SEO sind kaum von Timing/CPU-Last abhängig und
+        # bleiben deshalb auf dem vollen 0,95-Ziel.
+        run: |
+          for route in / /projekte /projekte/shop-prototyp/ /notizen /impressum /datenschutz; do
+            safe=$(echo "$route" | tr '/' '_')
+            npx --yes lighthouse "http://127.0.0.1:8091${route}" \
+              --output=json --output-path="/tmp/lh-${safe}.json" \
+              --chrome-flags="--headless=new --no-sandbox --disable-gpu" \
+              --only-categories=performance,accessibility,best-practices,seo \
+              --form-factor=mobile \
+              --quiet
+          done
+
+          python3 - <<'PYEOF'
+          import glob, json, sys
+
+          thresholds = {"performance": 0.90, "accessibility": 0.95, "best-practices": 0.95, "seo": 0.95}
+          failed = False
+          for path in sorted(glob.glob("/tmp/lh-*.json")):
+              data = json.load(open(path))
+              for category, minimum in thresholds.items():
+                  score = data["categories"][category]["score"]
+                  ok = score >= minimum
+                  print(f"{path}: {category}={score:.2f} (>= {minimum}) {'OK' if ok else 'FAIL'}")
+                  failed = failed or not ok
+          sys.exit(1 if failed else 0)
+          PYEOF
 
       - name: Admin-Testkonto anlegen
         run: |

@@ -1,4 +1,3 @@
-from pathlib import Path
 
 from web import create_app as create_web_app
 

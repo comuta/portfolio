@@ -33,7 +33,8 @@ def test_project_detail_redirects_to_trailing_slash(content_dir, client):
 
 
 def test_media_route_rejects_path_traversal(content_dir, client):
-    post_dir = write_post(content_dir, "2026-08-shop-prototyp", {"titel": "Shop", "datum": "2026-08-17", "typ": "projekt"})
+    meta = {"titel": "Shop", "datum": "2026-08-17", "typ": "projekt"}
+    post_dir = write_post(content_dir, "2026-08-shop-prototyp", meta)
     (post_dir / "medien").mkdir()
     (post_dir / "medien" / "bild.png").write_bytes(b"fake")
 
