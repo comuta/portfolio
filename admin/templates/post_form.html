@@ -91,8 +91,12 @@
       <input type="url" name="repository" value="{{ values.get('repository', '') }}">
     </label>
 
-    <label>Titelbild (relativer Pfad, z. B. medien/bild.png — Upload folgt in Kürze)
+    <label>Titelbild (relativer Pfad, z. B. medien/bild.png)
       <input type="text" name="titelbild" value="{{ values.get('titelbild', '') }}">
+    </label>
+
+    <label>Bilderstrecke (kommagetrennte relative Pfade, Reihenfolge = Anzeigereihenfolge)
+      <input type="text" name="galerie" value="{{ values.get('galerie', '') }}">
     </label>
 
     <fieldset>

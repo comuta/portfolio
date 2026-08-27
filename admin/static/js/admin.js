@@ -45,6 +45,7 @@ function setupMediaUpload() {
   const status = document.querySelector("[data-upload-status]");
   const textarea = document.querySelector("[data-markdown-source]");
   const titelbildInput = document.querySelector('input[name="titelbild"]');
+  const galerieInput = document.querySelector('input[name="galerie"]');
 
   form.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -86,7 +87,19 @@ function setupMediaUpload() {
           titelbildBtn.addEventListener("click", () => {
             titelbildInput.value = pfad;
           });
-          status.append(titelbildBtn);
+          status.append(titelbildBtn, document.createTextNode(" "));
+        }
+
+        if (galerieInput) {
+          const galerieBtn = document.createElement("button");
+          galerieBtn.type = "button";
+          galerieBtn.className = "button";
+          galerieBtn.textContent = "Zur Bilderstrecke hinzufügen";
+          galerieBtn.addEventListener("click", () => {
+            const vorhanden = galerieInput.value.trim();
+            galerieInput.value = vorhanden ? `${vorhanden}, ${pfad}` : pfad;
+          });
+          status.append(galerieBtn);
         }
 
         fileInput.value = "";

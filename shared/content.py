@@ -71,6 +71,7 @@ class Post(BaseModel):
     demo: Demo | None = None
     repository: str | None = None
     titelbild: str | None = None
+    galerie: list[str] = Field(default_factory=list)
     kunde: Kunde | None = None
 
     # Populated by the loader, not part of meta.json itself.
@@ -88,6 +89,18 @@ class Post(BaseModel):
             logger.warning("suspicious titelbild path %r in post %r, ignoring", self.titelbild, self.slug)
             return None
         return name
+
+    @property
+    def galerie_dateinamen(self) -> list[str]:
+        """Bare filenames of galerie, with a leading 'medien/' stripped; invalid entries skipped."""
+        result = []
+        for eintrag in self.galerie:
+            name = eintrag.removeprefix("medien/")
+            if "/" in name or ".." in name:
+                logger.warning("suspicious galerie path %r in post %r, ignoring", eintrag, self.slug)
+                continue
+            result.append(name)
+        return result
 
 
 class Alias(BaseModel):

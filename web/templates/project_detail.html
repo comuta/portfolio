@@ -91,4 +91,40 @@
       {% endif %}
     </aside>
   </div>
+
+  {% if post.galerie_dateinamen %}
+    <section class="gallery" aria-label="Bilderstrecke">
+      <h2 class="eyebrow">// bilderstrecke</h2>
+      <div class="gallery__grid">
+        {% for bild in post.galerie_dateinamen %}
+          <a class="gallery__thumb" href="#bild-{{ loop.index }}">
+            <img
+              src="{{ url_for('public.project_medium', slug=post.slug, dateiname=bild) }}"
+              alt="Screenshot {{ loop.index }} von {{ loop.length }} zu {{ post.titel }}"
+              loading="lazy">
+          </a>
+        {% endfor %}
+      </div>
+
+      {% for bild in post.galerie_dateinamen %}
+        <div class="lightbox" id="bild-{{ loop.index }}" role="dialog" aria-label="Bild {{ loop.index }} von {{ loop.length }}">
+          <a class="lightbox__scrim" href="#" aria-label="Schließen" tabindex="-1"></a>
+          <div class="lightbox__content">
+            <img
+              src="{{ url_for('public.project_medium', slug=post.slug, dateiname=bild) }}"
+              alt="Screenshot {{ loop.index }} von {{ loop.length }} zu {{ post.titel }}">
+            <div class="lightbox__nav">
+              {% if not loop.first %}
+                <a class="button" href="#bild-{{ loop.index - 1 }}">← zurück</a>
+              {% endif %}
+              <a class="button button--primary" href="#" aria-label="Schließen">schließen ×</a>
+              {% if not loop.last %}
+                <a class="button" href="#bild-{{ loop.index + 1 }}">weiter →</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </section>
+  {% endif %}
 {% endblock %}

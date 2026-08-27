@@ -127,6 +127,7 @@ def post_to_form_values(post: content.Post) -> dict:
         "demo_hinweis": (post.demo.hinweis if post.demo else "") or "",
         "repository": post.repository or "",
         "titelbild": post.titelbild or "",
+        "galerie": ", ".join(post.galerie),
         "kunde_nennung_erlaubt": "on" if (post.kunde and post.kunde.nennung_erlaubt) else "",
         "kunde_bezeichnung_anonym": (post.kunde.bezeichnung_anonym if post.kunde else "") or "",
         "kunde_name": (post.kunde.name if post.kunde else "") or "",
@@ -167,5 +168,6 @@ def parse_form(form) -> dict:
         "demo": demo,
         "repository": form.get("repository") or None,
         "titelbild": form.get("titelbild") or None,
+        "galerie": split_csv("galerie"),
         "kunde": kunde,
     }

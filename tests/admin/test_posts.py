@@ -75,6 +75,22 @@ def test_edit_preserves_dir_name_even_if_title_changes(logged_in_client, content
     assert "Ganz anderer Titel" in meta
 
 
+def test_galerie_field_round_trips_as_list(logged_in_client, content_dir):
+    resp = logged_in_client.post(
+        "/beitraege/neu",
+        data=_new_post_form(galerie="medien/a.png, medien/b.png"),
+        follow_redirects=False,
+    )
+    dir_name = resp.headers["Location"].split("/")[2]
+
+    meta = (content_dir / "beitraege" / "privat" / dir_name / "meta.json").read_text()
+    assert '"medien/a.png"' in meta
+    assert '"medien/b.png"' in meta
+
+    edit_resp = logged_in_client.get(f"/beitraege/{dir_name}/bearbeiten")
+    assert b"medien/a.png, medien/b.png" in edit_resp.data
+
+
 def test_edit_unknown_dir_name_is_404(logged_in_client):
     resp = logged_in_client.get("/beitraege/does-not-exist/bearbeiten")
     assert resp.status_code == 404
