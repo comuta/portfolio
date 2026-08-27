@@ -38,7 +38,11 @@ def create_app(content_dir: str | None = None) -> Flask:
     app.config["SESSION_COOKIE_SAMESITE"] = "Strict"
     app.config["SESSION_COOKIE_SECURE"] = not debug
     app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=8)
-    app.config["MAX_CONTENT_LENGTH"] = 8 * 1024 * 1024
+    # 8 MiB was sized for one image per request; the Bilderstrecke upload
+    # widget sends several files in a single request, so the cap has to
+    # cover a whole batch, not just one photo. Keep README's nginx
+    # client_max_body_size above this.
+    app.config["MAX_CONTENT_LENGTH"] = 40 * 1024 * 1024
 
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 

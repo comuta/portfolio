@@ -217,8 +217,10 @@ server {
     # FA-22: nicht indexieren, keine Suchmaschine soll den Admin-Host verlinken.
     add_header X-Robots-Tag "noindex, nofollow" always;
 
-    # FA-24: Obergrenze auch am Proxy, nicht nur in Flasks MAX_CONTENT_LENGTH.
-    client_max_body_size 20m;
+    # FA-24: Obergrenze auch am Proxy, nicht nur in Flasks MAX_CONTENT_LENGTH
+    # (aktuell 40m dort — Bilderstrecke-Upload schickt mehrere Dateien pro
+    # Request, also muss die Grenze einen ganzen Batch abdecken).
+    client_max_body_size 45m;
 
     location / {
         auth_basic           "Portfolio Admin";
