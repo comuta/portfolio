@@ -42,7 +42,7 @@
               <a href="/projekte/{{ project.slug }}/">{{ project.titel }}</a>
               <p class="entry-table__desc">{{ project.kurzbeschreibung }}</p>
             </td>
-            <td>{{ project.stack | join(', ') }}</td>
+            <td{% if project.stack | length > 3 %} title="{{ project.stack | join(', ') }}"{% endif %}>{{ project.stack[:3] | join(', ') }}{% if project.stack | length > 3 %} …{% endif %}</td>
             <td>{{ project.status or '' }}</td>
           </tr>
         {% else %}
