@@ -71,8 +71,8 @@ jobs:
 
       - name: Endpunkte prüfen
         run: |
-          curl -sf http://127.0.0.1:8091/healthz
-          curl -sf http://127.0.0.1:8092/healthz
+          curl -sf http://127.0.0.1:8010/healthz
+          curl -sf http://127.0.0.1:8011/healthz
 
       - name: Node.js einrichten (für Lighthouse)
         uses: actions/setup-node@v4
@@ -89,7 +89,7 @@ jobs:
         run: |
           for route in / /projekte /projekte/shop-prototyp/ /notizen /impressum /datenschutz; do
             safe=$(echo "$route" | tr '/' '_')
-            npx --yes lighthouse "http://127.0.0.1:8091${route}" \
+            npx --yes lighthouse "http://127.0.0.1:8010${route}" \
               --output=json --output-path="/tmp/lh-${safe}.json" \
               --chrome-flags="--headless=new --no-sandbox --disable-gpu" \
               --only-categories=performance,accessibility,best-practices,seo \
@@ -129,20 +129,20 @@ jobs:
           pip install --quiet pyotp
           cookie_jar=$(mktemp)
 
-          login_html=$(curl -sS -c "$cookie_jar" http://127.0.0.1:8092/login)
+          login_html=$(curl -sS -c "$cookie_jar" http://127.0.0.1:8011/login)
           csrf=$(echo "$login_html" | grep -o 'name="csrf_token" value="[^"]*"' | head -1 | sed 's/.*value="\(.*\)"/\1/')
           code=$(python3 -c "import pyotp; print(pyotp.TOTP('$TOTP_SECRET').now())")
 
-          curl -sS -b "$cookie_jar" -c "$cookie_jar" -o /dev/null -X POST http://127.0.0.1:8092/login \
+          curl -sS -b "$cookie_jar" -c "$cookie_jar" -o /dev/null -X POST http://127.0.0.1:8011/login \
             --data-urlencode "csrf_token=$csrf" \
             --data-urlencode "benutzername=ci-test" \
             --data-urlencode "passwort=ci-test-passwort-123" \
             --data-urlencode "code=$code"
 
-          settings_html=$(curl -sS -b "$cookie_jar" -c "$cookie_jar" http://127.0.0.1:8092/einstellungen)
+          settings_html=$(curl -sS -b "$cookie_jar" -c "$cookie_jar" http://127.0.0.1:8011/einstellungen)
           csrf2=$(echo "$settings_html" | grep -o 'name="csrf_token" value="[^"]*"' | head -1 | sed 's/.*value="\(.*\)"/\1/')
 
-          save_status=$(curl -sS -b "$cookie_jar" -c "$cookie_jar" -o /dev/null -w "%{http_code}" -X POST http://127.0.0.1:8092/einstellungen \
+          save_status=$(curl -sS -b "$cookie_jar" -c "$cookie_jar" -o /dev/null -w "%{http_code}" -X POST http://127.0.0.1:8011/einstellungen \
             --data-urlencode "csrf_token=$csrf2" \
             --data-urlencode "name=CI Test" \
             --data-urlencode "kurzprofil=x" \

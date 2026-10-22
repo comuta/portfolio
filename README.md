@@ -23,8 +23,8 @@ cp .env.example .env
 docker compose up -d
 ```
 
-Das startet `web` (`http://127.0.0.1:8091`) und `admin`
-(`http://127.0.0.1:8092`) mit Demo-Inhalten aus `./content`. Die eigentlichen
+Das startet `web` (`http://127.0.0.1:8010`) und `admin`
+(`http://127.0.0.1:8011`) mit Demo-Inhalten aus `./content`. Die eigentlichen
 Laufzeitdaten liegen in `./data` (git-ignoriert, eigenes Git-Repository —
 siehe unten).
 
@@ -145,8 +145,8 @@ Repos und muss auf dem Server einmalig eingerichtet werden.
 
 | Hostname | Ziel | Besonderheit |
 |---|---|---|
-| `portfolio.wedel.dev` | `127.0.0.1:8091` (web) | Proxy-Cache (AE-03) |
-| `portfolio-admin.wedel.dev` | `127.0.0.1:8092` (admin) | HTTP Basic Auth zusätzlich zum App-Login (FA-21), `noindex` (FA-22) |
+| `portfolio.wedel.dev` | `127.0.0.1:8010` (web) | Proxy-Cache (AE-03) |
+| `portfolio-admin.wedel.dev` | `127.0.0.1:8011` (admin) | HTTP Basic Auth zusätzlich zum App-Login (FA-21), `noindex` (FA-22) |
 
 **Basic-Auth-Datei einmalig anlegen** (zweiter, von der App unabhängiger
 Faktor vor dem Admin-Login):
@@ -178,7 +178,7 @@ server {
     ssl_certificate_key /etc/letsencrypt/live/wedel.dev/privkey.pem;
 
     location / {
-        proxy_pass http://127.0.0.1:8091;
+        proxy_pass http://127.0.0.1:8010;
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
@@ -226,7 +226,7 @@ server {
         auth_basic           "Portfolio Admin";
         auth_basic_user_file /etc/nginx/portfolio-admin.htpasswd;
 
-        proxy_pass http://127.0.0.1:8092;
+        proxy_pass http://127.0.0.1:8011;
         proxy_set_header Host $host;
         # FA-21: genau ein Proxy-Hop — passend zu ProxyFix(x_for=1, x_proto=1,
         # x_host=1) in admin/__init__.py. Ohne diese drei Header laufen
