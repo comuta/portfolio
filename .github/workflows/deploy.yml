@@ -164,33 +164,14 @@ jobs:
         run: docker compose down -v
 
   deploy:
-    runs-on: self-hosted
+    # Kein Checkout, kein eigenes docker compose: deploy-prod läuft als prod
+    # mit dessen rootless Docker, holt origin/main nach
+    # /home/prod/apps/portfolio und lässt .env sowie data/ dabei unangetastet.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, wedel, portfolio]
+    environment: production
     needs: [test, docker-smoke]
     timeout-minutes: 15
-    env:
-      ENV_FILE: /etc/portfolio/.env
     steps:
-      - name: Code auschecken
-        uses: actions/checkout@v6
-
-      - name: Umgebung prüfen
-        run: |
-          echo "Läuft auf: $(hostname)"
-          whoami
-          docker compose version
-
-      - name: .env prüfen
-        run: |
-          if [ ! -r "$ENV_FILE" ]; then
-            echo "Kann $ENV_FILE nicht lesen - liegt sie an der Stelle und darf der Runner-Nutzer sie lesen?"
-            exit 1
-          fi
-
-      - name: Container bauen und starten
-        run: docker compose --env-file "$ENV_FILE" up --build -d
-
-      - name: Alte Images aufräumen
-        run: docker image prune -f
-
-      - name: Status
-        run: docker compose --env-file "$ENV_FILE" ps
+      - name: Deploy
+        run: sudo -n -u prod /usr/local/bin/deploy-prod portfolio

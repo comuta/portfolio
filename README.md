@@ -99,13 +99,11 @@ eigentliche Laufzeitverzeichnis — git-ignoriert und ein eigenes Git-Repository
 ersten Start richtet der `init`-Dienst die Struktur ein und kopiert optional
 die Demo-Inhalte aus `./content`.
 
-**Wichtig für jedes CI/deploy-gesteuerte Setup:** `DATA_DIR` muss außerhalb
-jedes Verzeichnisses liegen, das ein Checkout-Tool neu anlegen oder aufräumen
-könnte — die Container schreiben dort als uid 1000, und ein Cleanup-Schritt,
-der als anderer Host-Benutzer läuft (z. B. ein GitHub-Actions-Runner-Dienst-
-konto), kann diese Dateien dann nicht mehr entfernen. In `.env`
-`DATA_DIR=/var/lib/portfolio` setzen (Pfad laut Anforderungskatalog) — siehe
-`.env.example`.
+**Produktion:** `DATA_DIR` bleibt auf dem Standard `./data`
+(`/home/prod/apps/portfolio/data`). Das Deploy-Skript macht nur `git fetch` +
+`git reset --hard origin/main` ohne `git clean`, ungetrackte Dateien wie
+`data/` und `.env` bleiben also erhalten. Pfade außerhalb des App-Ordners
+sind mit rootless Docker nicht vorgesehen.
 
 ## Tests
 
@@ -125,16 +123,19 @@ privat/öffentlich, CLI-Befehle, Einstellungsformular).
 auslösbar) laufen zuerst `pytest` sowie ein echter Docker-Smoke-Test (bauen,
 hochfahren, auf `healthy` warten, `/healthz` beider Dienste abfragen — beide
 bisherigen echten Bugs in diesem Projekt zeigten sich nur beim tatsächlichen
-Containerstart, nie in reinen Python-Tests). Erst wenn beides grün ist, deployt
-ein self-hosted Runner auf dem Server per `docker compose up --build -d`,
-analog zur bestehenden Pipeline eines anderen Projekts auf demselben Server.
+Containerstart, nie in reinen Python-Tests). Erst wenn beides grün ist und
+es ein Push auf `main` war, ruft ein self-hosted Runner
+(`[self-hosted, wedel, portfolio]`, Environment `production`) nur
+`sudo -n -u prod /usr/local/bin/deploy-prod portfolio` auf; das Skript baut
+und startet den Stack als `prod` mit dessen rootless Docker.
 
 **Vor dem ersten Lauf auf dem Server einzurichten** (nicht Teil dieses Repos):
-- `/etc/portfolio/.env` mit `SECRET_KEY=...` anlegen, lesbar für den
-  Runner-Nutzer (Pfad in `deploy.yml` anpassen, falls ein anderer gewünscht ist).
-- Ein self-hosted Runner muss für dieses Repository registriert sein.
+- `/home/prod/apps/portfolio/.env` mit `SECRET_KEY=...` anlegen (Owner
+  `prod`, `chmod 600`), siehe `.env.example`.
+- Ein self-hosted Runner mit den Labels `wedel` und `portfolio` muss für
+  dieses Repository registriert sein.
 - Admin-Zugang bleibt weiterhin ein manueller, einmaliger Schritt auf dem
-  Server: `docker compose run --rm admin-cli flask --app wsgi_admin create-user`.
+  Server: `docker compose run --rm admin-cli create-user`.
 
 ## Nginx als Reverse Proxy
 

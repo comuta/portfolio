@@ -7,12 +7,10 @@
 # DATA_DIR is the runtime content directory, defaulting to ./data for local
 # dev — separate from the demo content checked into ./content, gitignored,
 # and its own git repo (FA-41), which would conflict with it also being
-# tracked by this repo. In production it MUST point outside any directory
-# that a CI/deploy checkout can recreate or clean: containers write into it
-# as uid 1000, and a checkout tool running as a different host user (e.g. a
-# GitHub Actions runner service account) then can't remove those files
-# during its own housekeeping — set DATA_DIR=/var/lib/portfolio (the path
-# the Anforderungskatalog itself specifies) in the deploy env file.
+# tracked by this repo. Production keeps the ./data default as well
+# (/home/prod/apps/portfolio/data): deploy-prod only does git fetch + reset
+# --hard without git clean, so the untracked data/ survives every deploy.
+# Don't point it outside the app directory — rootless Docker can't reach it.
 #
 # web's mounts are directory-granular (FA-12: it must not even see privat/
 # or zugang/). admin/admin-cli mount the whole ./data tree at once instead,

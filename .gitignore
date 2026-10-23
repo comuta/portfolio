@@ -12,7 +12,7 @@ instance/
 # See content/site.config.example.json for the placeholder template.
 content/site.config.json
 
-# Docker Compose runtime content directory (mirrors /var/lib/portfolio).
+# Docker Compose runtime content directory (/home/prod/apps/portfolio/data in production).
 # It's its own git repo (FA-41) managed by the admin app, not this repo.
 /data/
 
